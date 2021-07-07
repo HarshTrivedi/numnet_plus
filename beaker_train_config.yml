@@ -1,0 +1,32 @@
+version: v2-alpha
+description: Run of NumNet on {{.Env.DATA_DS}}
+tasks:
+  - image:
+      beaker: {{.Env.IMG}}
+    arguments:
+      - sh
+      - train.sh
+      - 345
+      - 5e-4
+      - 1.5e-5
+      - 5e-5
+      - 0.01
+    envVars:
+      - name: DATA_DIR
+        value: "/input/"
+      - name: MODEL_DIR
+        value: "/model/"
+      - name: OUT_DIR
+        value: "/output/"
+    datasetMounts:
+      - datasetId: {{.Env.MODEL_DS}}
+        containerPath: /model
+      - datasetId: {{.Env.DATA_DS}}
+        containerPath: /input
+    result:
+      path: /output
+    resources:
+      gpuCount: 1
+    context:
+      cluster: ai2/on-prem-ai2-server
+      priority: normal

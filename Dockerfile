@@ -31,7 +31,5 @@ RUN pip install -r requirements.txt
 # Copy remaining code.
 COPY . .
 
-RUN ["chmod", "+x", "/local/run_model.sh"]
+CMD ["/bin/bash"]
 
-# EXPOSE 8000
-Cmd ["/bin/bash"]
