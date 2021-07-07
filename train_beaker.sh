@@ -18,7 +18,7 @@ if [ ${TMSPAN} = tag_mspan ];then
   MODEL_CONFIG="--gcn_steps 3 --use_gcn --tag_mspan"
   if [ \( ! -e "${CACHED_TRAIN}" \)  -o \( ! -e "${CACHED_DEV}" \) ]; then
   echo "Preparing cached data."
-  python prepare_roberta_data.py --input_path ${DATA_DIR} --output_dir ${OUT_DIR} --tag_mspan
+  python prepare_roberta_data.py --input_path ${DATA_DIR} --output_dir ${OUT_DIR} --model_path ${MODEL_DIR} --tag_mspan
   fi
 else
   echo "Use mspan model..."
@@ -27,7 +27,7 @@ else
   MODEL_CONFIG="--gcn_steps 3 --use_gcn"
   if [ \( ! -e "${CACHED_TRAIN}" \)  -o \( ! -e "${CACHED_DEV}" \) ]; then
   echo "Preparing cached data."
-  python prepare_roberta_data.py --input_path ${DATA_DIR} --output_dir ${OUT_DIR}
+  python prepare_roberta_data.py --input_path ${DATA_DIR} --output_dir ${OUT_DIR} --model_path ${MODEL_DIR}
   fi
 fi
 

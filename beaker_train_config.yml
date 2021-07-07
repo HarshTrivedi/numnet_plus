@@ -5,7 +5,7 @@ tasks:
       beaker: {{.Env.IMG}}
     arguments:
       - sh
-      - train.sh
+      - train_beaker.sh
       - 345
       - 5e-4
       - 1.5e-5
@@ -18,11 +18,13 @@ tasks:
         value: "/model/"
       - name: OUT_DIR
         value: "/output/"
-    datasetMounts:
-      - datasetId: {{.Env.MODEL_DS}}
-        containerPath: /model
-      - datasetId: {{.Env.DATA_DS}}
-        containerPath: /input
+    datasets:
+      - mountPath: /model
+        source:
+          beaker: {{.Env.MODEL_DS}}
+      - mountPath: /input
+        source:
+          beaker: {{.Env.DATA_DS}}
     result:
       path: /output
     resources:
