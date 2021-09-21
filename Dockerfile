@@ -23,7 +23,7 @@ RUN apt-get update --fix-missing && apt-get install -y \
 WORKDIR /local
 
 RUN pip install -U scikit-learn
-RUN pip install overrides == 3.1.0
+RUN pip install overrides==3.1.0
 
 # Install dependencies.
 COPY ./requirements.txt .
