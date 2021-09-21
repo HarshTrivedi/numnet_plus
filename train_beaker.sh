@@ -19,6 +19,9 @@ if [ ${TMSPAN} = tag_mspan ];then
   if [ \( ! -e "${CACHED_TRAIN}" \)  -o \( ! -e "${CACHED_DEV}" \) ]; then
   echo "Preparing cached data."
   python prepare_roberta_data.py --input_path ${DATA_DIR} --output_dir ${OUT_DIR} --model_path ${MODEL_DIR} --tag_mspan
+  CACHE_DIR=${OUT_DIR}
+  else
+  CACHE_DIR=${DATA_DIR}
   fi
 else
   echo "Use mspan model..."
@@ -28,12 +31,15 @@ else
   if [ \( ! -e "${CACHED_TRAIN}" \)  -o \( ! -e "${CACHED_DEV}" \) ]; then
   echo "Preparing cached data."
   python prepare_roberta_data.py --input_path ${DATA_DIR} --output_dir ${OUT_DIR} --model_path ${MODEL_DIR}
+  CACHE_DIR=${OUT_DIR}
+  else
+  CACHE_DIR=${DATA_DIR}
   fi
 fi
 
 
 SAVE_DIR=${OUT_DIR}/numnet_plus_${SEED}_LR_${LR}_BLR_${BLR}_WD_${WD}_BWD_${BWD}${TMSPAN}
-DATA_CONFIG="--data_dir ${DATA_DIR} --save_dir ${SAVE_DIR}"
+DATA_CONFIG="--data_dir ${CACHE_DIR} --save_dir ${SAVE_DIR}"
 TRAIN_CONFIG="--batch_size 16 --eval_batch_size 5 --max_epoch 5 --warmup 0.06 --optimizer adam \
               --learning_rate ${LR} --weight_decay ${WD} --seed ${SEED} --gradient_accumulation_steps 4 \
               --bert_learning_rate ${BLR} --bert_weight_decay ${BWD} --log_per_updates 100 --eps 1e-6"
