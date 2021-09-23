@@ -13,6 +13,7 @@ from pytorch_transformers import RobertaTokenizer, RobertaModel, RobertaConfig
 
 
 parser = argparse.ArgumentParser("Bert inference task.")
+options.add_data_args(parser)
 options.add_bert_args(parser)
 options.add_model_args(parser)
 options.add_inference_args(parser)
