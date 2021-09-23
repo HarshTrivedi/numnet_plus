@@ -7,7 +7,9 @@ LR=$2
 BLR=$3
 WD=$4
 BWD=$5
-TMSPAN=$6
+BATCH=$6
+GRAD=$7
+TMSPAN=$8
 
 CODE_DIR=.
 
@@ -40,8 +42,8 @@ fi
 
 SAVE_DIR=${OUT_DIR}/numnet_plus_${SEED}_LR_${LR}_BLR_${BLR}_WD_${WD}_BWD_${BWD}${TMSPAN}
 DATA_CONFIG="--data_dir ${CACHE_DIR} --save_dir ${SAVE_DIR}"
-TRAIN_CONFIG="--batch_size 16 --eval_batch_size 5 --max_epoch 5 --warmup 0.06 --optimizer adam \
-              --learning_rate ${LR} --weight_decay ${WD} --seed ${SEED} --gradient_accumulation_steps 4 \
+TRAIN_CONFIG="--batch_size ${BATCH} --eval_batch_size ${BATCH} --max_epoch 5 --warmup 0.06 --optimizer adam \
+              --learning_rate ${LR} --weight_decay ${WD} --seed ${SEED} --gradient_accumulation_steps ${GRAD} \
               --bert_learning_rate ${BLR} --bert_weight_decay ${BWD} --log_per_updates 100 --eps 1e-6"
 BERT_CONFIG="--roberta_model ${MODEL_DIR}"
 
@@ -54,7 +56,7 @@ python ${CODE_DIR}/roberta_gcn_cli.py \
     ${MODEL_CONFIG}
 
 echo "Starting evaluation..."
-TEST_CONFIG="--eval_batch_size 5 --pre_path ${SAVE_DIR}/checkpoint_best.pt --data_mode dev --dump_path ${SAVE_DIR}/dev.json \
+TEST_CONFIG="--eval_batch_size ${BATCH} --pre_path ${SAVE_DIR}/checkpoint_best.pt --data_mode dev --dump_path ${SAVE_DIR}/dev.json \
              --inf_path ${DATA_DIR}/drop_dataset_dev.json"
 
 python ${CODE_DIR}/roberta_predict.py \
