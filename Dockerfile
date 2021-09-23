@@ -32,7 +32,7 @@ RUN apt-get update --fix-missing && apt-get install -y \
 
 WORKDIR /local
 
-RUN pip install torch==1.0.0+cu100 -f https://download.pytorch.org/whl/torch_stable.html
+RUN pip install torch==1.0.0 -f https://download.pytorch.org/whl/cu100/torch_stable.html
 RUN pip install -U scikit-learn
 RUN pip install overrides==3.1.0
 
