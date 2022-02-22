@@ -1,0 +1,6 @@
+{
+    "project_name": "synth2realmh",
+    "working_dir": "/run",
+    "image_critical_paths": [],
+    "beaker_workspace": "harsh-trivedi/synth2realmh"
+}
