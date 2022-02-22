@@ -7,6 +7,7 @@ from tag_mspan_robert_gcn.drop_roberta_mspan_dataset import DropReader as TDropR
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_path", type=str)
+parser.add_argument("--model_path", type=str, default=None)
 parser.add_argument("--output_dir", type=str)
 parser.add_argument("--passage_length_limit", type=int, default=463)
 parser.add_argument("--question_length_limit", type=int, default=46)
@@ -14,7 +15,10 @@ parser.add_argument("--tag_mspan", action="store_true")
 
 args = parser.parse_args()
 
-tokenizer = RobertaTokenizer.from_pretrained(args.input_path + "/roberta.large")
+if args.model_path is None:
+    tokenizer = RobertaTokenizer.from_pretrained(args.input_path + "/roberta.large")
+else:
+    tokenizer = RobertaTokenizer.from_pretrained(args.model_path)
 
 if args.tag_mspan:
     dev_reader = TDropReader(
