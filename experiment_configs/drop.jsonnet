@@ -1,4 +1,4 @@
 {
-    "train_filepath": "drop_dataset/drop_dataset_train.json",
-    "dev_filepath": "drop_dataset/drop_dataset_dev.json"
+    "train_filepath": "raw_data/drop/drop_dataset_train.json",
+    "dev_filepath": "raw_data/drop/drop_dataset_dev.json"
 }

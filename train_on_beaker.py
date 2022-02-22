@@ -115,6 +115,7 @@ def main():
 
     image_prefix = "numnetplusv2_"
     beaker_image = prepare_beaker_image(
+        dockerfile="numnet_plus/Dockerfile",
         allow_rollback=args.allow_rollback,
         beaker_image_prefix=image_prefix
     )
