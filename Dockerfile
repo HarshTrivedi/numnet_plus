@@ -32,16 +32,25 @@ RUN apt-get update --fix-missing && apt-get install -y \
 
 WORKDIR /local
 
-RUN pip install torch==1.10.0+cu111 -f https://download.pytorch.org/whl/cu111/torch_stable.html
+RUN pip install allennlp==0.8.5
+RUN pip install torch==1.7.0+cu110 torchvision==0.8.1+cu110 torchaudio===0.7.0 -f https://download.pytorch.org/whl/torch_stable.html
 RUN pip install -U scikit-learn
 RUN pip install overrides==3.1.0
 
-# Install dependencies.
-COPY ./requirements.txt .
-RUN pip install -r requirements.txt
-
 # Copy remaining code.
-COPY . .
+COPY numnet_plus/drop_eval.py drop_eval.py
+COPY numnet_plus/eval.sh eval.sh
+COPY numnet_plus/mspan_roberta_gcn mspan_roberta_gcn
+COPY numnet_plus/numnet_plus_pic.png numnet_plus_pic.png
+COPY numnet_plus/options.py options.py
+COPY numnet_plus/prepare_roberta_data.py prepare_roberta_data.py
+COPY numnet_plus/roberta_gcn_cli.py roberta_gcn_cli.py
+COPY numnet_plus/roberta_predict.py roberta_predict.py
+COPY numnet_plus/tag_mspan_robert_gcn tag_mspan_robert_gcn
+COPY numnet_plus/tools tools
+COPY numnet_plus/train.sh train.sh
+COPY numnet_plus/train_beaker.sh train_beaker.sh
+COPY numnet_plus/train_on_beaker.py train_on_beaker.py
 
 CMD ["/bin/bash"]
 

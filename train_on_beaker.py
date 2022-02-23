@@ -24,26 +24,36 @@ from processing_scripts.lib import read_jsonl, write_jsonl, hash_object, clean_w
 
 
 def load_dataset_mounts(
-        input_file_paths: List[str],
+        train_filepath: str,
+        dev_filepath: str,
         working_dir="/run",
     ) -> List[Dict]:
 
-    beaker_dataset_mounts = []
-    for input_file_path in input_file_paths:
+    # Setup Model Mount
+    beaker_dataset_mounts = [{
+        "datasetId": "tushark/numnet_roberta",
+        "containerPath": "/model",
+    }]
 
-        input_file_time = datetime.utcfromtimestamp(os.path.getmtime(input_file_path)).replace(tzinfo=None)
+    # Setup Train file mount
+    dataset_name = safe_create_dataset(train_filepath)
+    dataset_id = dataset_name_to_id(dataset_name)
+    file_name = os.path.basename(train_filepath)
+    beaker_dataset_mounts.append({
+        "datasetId": dataset_id,
+        "subPath": file_name,
+        "containerPath": f"/input/drop_dataset_train.json"
+    })
 
-        for index, split_file_path in enumerate(split_file_paths):
-
-            dataset_name = safe_create_dataset(input_file_path)
-            dataset_id = dataset_name_to_id(dataset_name)
-            file_name = os.path.basename(input_file_path)
-
-            beaker_dataset_mounts.append({
-                "datasetId": dataset_id,
-                "subPath": file_name,
-                "containerPath": f"{working_dir}/{input_file_path}"
-            })
+    # Setup Dev file mount
+    dataset_name = safe_create_dataset(train_filepath)
+    dataset_id = dataset_name_to_id(dataset_name)
+    file_name = os.path.basename(train_filepath)
+    beaker_dataset_mounts.append({
+        "datasetId": dataset_id,
+        "subPath": file_name,
+        "containerPath": f"/input/drop_dataset_dev.json"
+    })
 
     return beaker_dataset_mounts
 
@@ -51,8 +61,8 @@ def load_dataset_mounts(
 def make_beaker_experiment_name(
         train_filepath: str, dev_filepath: str
     ) -> str:
-    hash_object = hash_object(train_filepath+dev_filepath)[:10]
-    experiment_name = "train_numnetplusv2_" + hash_object
+    hash_ = hash_object(train_filepath+dev_filepath)[:10]
+    experiment_name = "train_numnetplusv2_" + hash_
     return experiment_name
 
 
@@ -86,7 +96,7 @@ def main():
     args = parser.parse_args()
 
     experiment_config_path = os.path.join(
-        "experiment_configs", args.experiment_name + ".json"
+        "numnet_plus", "experiment_configs", args.experiment_name + ".jsonnet"
     )
     with open(experiment_config_path, "r") as file:
         experiment_config = json.load(file)
@@ -113,7 +123,7 @@ def main():
     # Prepare Dataset Mounts
     dataset_mounts = load_dataset_mounts(train_filepath, dev_filepath)
 
-    image_prefix = "numnetplusv2_"
+    image_prefix = "numnetplusv2"
     beaker_image = prepare_beaker_image(
         dockerfile="numnet_plus/Dockerfile",
         allow_rollback=args.allow_rollback,
@@ -122,13 +132,9 @@ def main():
 
     beaker_image_id = image_name_to_id(beaker_image)
 
-    results_path = os.path.join(working_dir, output_directory)
-
     # Prepare Experiment Config
-
     beaker_experiment_name = make_beaker_experiment_name(train_filepath, dev_filepath)
     beaker_experiment_description = make_beaker_experiment_description(train_filepath, dev_filepath)
-
 
     arguments = [
         "sh", "train_beaker.sh", "345", "5e-4", "1.5e-5", "5e-5", "0.01", "16", "8"
@@ -137,11 +143,15 @@ def main():
          "spec": {
              "description": beaker_experiment_description,
              "image": beaker_image_id,
-             "resultPath": results_path,
+             "resultPath": "/output",
              "args": arguments,
-             "datasetMounts": task_dataset_mounts,
-             "requirements": {"gpuCount": int(add_gpu)},
-             "env": {}
+             "datasetMounts": dataset_mounts,
+             "requirements": {"gpuCount": 1},
+             "env": {
+                 "DATA_DIR": "/input/",
+                 "MODEL_DIR": "/model/",
+                 "OUT_DIR": "/output/",
+             }
          },
          "name": beaker_experiment_name,
          "cluster": cluster        
