@@ -103,6 +103,7 @@ def main():
 
     train_filepath = experiment_config["train_filepath"]
     dev_filepath = experiment_config["dev_filepath"]
+    skip_tagging = experiment_config.get("skip_tagging", False)
 
     cluster_map = {
         "v100": "ai2/harsh-v100",
@@ -139,6 +140,9 @@ def main():
     arguments = [
         "sh", "train_beaker.sh", "345", "5e-4", "1.5e-5", "5e-5", "0.01", "16", "8", "tag_mspan"
     ]
+    if skip_tagging:
+        arguments.pop()
+
     task_config = {
          "spec": {
              "description": beaker_experiment_description,
