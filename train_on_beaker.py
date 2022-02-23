@@ -137,7 +137,7 @@ def main():
     beaker_experiment_description = make_beaker_experiment_description(train_filepath, dev_filepath)
 
     arguments = [
-        "sh", "train_beaker.sh", "345", "5e-4", "1.5e-5", "5e-5", "0.01", "16", "8"
+        "sh", "train_beaker.sh", "345", "5e-4", "1.5e-5", "5e-5", "0.01", "16", "8", "tag_mspan"
     ]
     task_config = {
          "spec": {
