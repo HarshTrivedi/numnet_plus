@@ -59,9 +59,9 @@ def load_dataset_mounts(
 
 
 def make_beaker_experiment_name(
-        train_filepath: str, dev_filepath: str
+        command: str, train_filepath: str, dev_filepath: str
     ) -> str:
-    hash_ = hash_object(train_filepath+dev_filepath)[:10]
+    hash_ = hash_object(command+train_filepath+dev_filepath)[:10]
     experiment_name = "train_numnetplusv2_" + hash_
     return experiment_name
 
@@ -133,15 +133,17 @@ def main():
 
     beaker_image_id = image_name_to_id(beaker_image)
 
-    # Prepare Experiment Config
-    beaker_experiment_name = make_beaker_experiment_name(train_filepath, dev_filepath)
-    beaker_experiment_description = make_beaker_experiment_description(train_filepath, dev_filepath)
 
     arguments = [
         "sh", "train_beaker.sh", "345", "5e-4", "1.5e-5", "5e-5", "0.01", "16", "8", "tag_mspan"
     ]
     if skip_tagging:
         arguments.pop()
+
+    # Prepare Experiment Config
+    command = " ".join(arguments)
+    beaker_experiment_name = make_beaker_experiment_name(command, train_filepath, dev_filepath)
+    beaker_experiment_description = make_beaker_experiment_description(train_filepath, dev_filepath)
 
     task_config = {
          "spec": {
