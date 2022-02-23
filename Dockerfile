@@ -32,8 +32,9 @@ RUN apt-get update --fix-missing && apt-get install -y \
 
 WORKDIR /local
 
-RUN pip install allennlp==0.8.5
-RUN pip install torch==1.7.0+cu110 torchvision==0.8.1+cu110 torchaudio===0.7.0 -f https://download.pytorch.org/whl/torch_stable.html
+RUN pip install allennlp==0.9.0
+RUN pip install torch==1.7.1+cu110 -f https://download.pytorch.org/whl/torch_stable.html
+
 RUN pip install -U scikit-learn
 RUN pip install overrides==3.1.0
 
