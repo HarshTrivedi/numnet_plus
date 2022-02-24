@@ -46,9 +46,9 @@ def load_dataset_mounts(
     })
 
     # Setup Dev file mount
-    dataset_name = safe_create_dataset(train_filepath)
+    dataset_name = safe_create_dataset(dev_filepath)
     dataset_id = dataset_name_to_id(dataset_name)
-    file_name = os.path.basename(train_filepath)
+    file_name = os.path.basename(dev_filepath)
     beaker_dataset_mounts.append({
         "datasetId": dataset_id,
         "subPath": file_name,
