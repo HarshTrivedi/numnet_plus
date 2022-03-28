@@ -103,6 +103,15 @@ def main():
 
     train_filepath = experiment_config["train_filepath"]
     dev_filepath = experiment_config["dev_filepath"]
+
+    random_seed = experiment_config.get("random_seed", 345)
+    epochs = experiment_config.get("epochs", 5)
+    learning_rate = experiment_config.get("learning_rate", 5e-4)
+    bert_learning_rate = experiment_config.get("bert_learning_rate", 1.5e-5)
+    weight_decay = experiment_config.get("weight_decay", 5e-5)
+    bert_weight_decay = experiment_config.get("bert_weight_decay", 0.01)
+    batch_size = experiment_config.get("batch_size", 16)
+    gradient_accum = experiment_config.get("gradient_accum", 8)
     skip_tagging = experiment_config.get("skip_tagging", False)
 
     cluster_map = {
@@ -135,7 +144,9 @@ def main():
 
 
     arguments = [
-        "sh", "train_beaker.sh", "345", "5e-4", "1.5e-5", "5e-5", "0.01", "16", "8", "tag_mspan"
+        "sh", "train_beaker.sh",
+        str(random_seed), str(epochs), str(learning_rate), str(bert_learning_rate), str(weight_decay),
+        str(bert_weight_decay), str(batch_size), str(gradient_accum), "tag_mspan"
     ]
     if skip_tagging:
         arguments.pop()
