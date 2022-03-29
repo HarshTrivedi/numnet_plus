@@ -67,7 +67,7 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('experiment_name', type=str, help="Experiment name.")
-    parser.add_argument('evaluation_file_path', type=str, help='Evaluation file path relative to project root.')
+    parser.add_argument('evaluation_filepath', type=str, help='Evaluation file path relative to project root.')
     parser.add_argument(
         '--cluster', type=str,
         choices={"v100", "onperm-aristo", "onperm-ai2", "onperm-mosaic", "cpu"},

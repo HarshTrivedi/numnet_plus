@@ -50,8 +50,10 @@ COPY numnet_plus/roberta_predict.py roberta_predict.py
 COPY numnet_plus/tag_mspan_robert_gcn tag_mspan_robert_gcn
 COPY numnet_plus/tools tools
 COPY numnet_plus/train.sh train.sh
+COPY numnet_plus/predict_beaker.sh predict_beaker.sh
 COPY numnet_plus/train_beaker.sh train_beaker.sh
 COPY numnet_plus/train_on_beaker.py train_on_beaker.py
+COPY numnet_plus/predict_on_beaker.py predict_on_beaker.py
 
 CMD ["/bin/bash"]
 
