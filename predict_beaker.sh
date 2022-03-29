@@ -22,7 +22,7 @@ DATA_CONFIG="--data_dir ${CACHE_DIR} --save_dir ${OUT_DIR}"
 BERT_CONFIG="--roberta_model ${MODEL_DIR}"
 
 echo "Starting evaluation..."
-TEST_CONFIG="--eval_batch_size ${BATCH} --pre_path ${CKPT_DIR}/checkpoint_best.pt --data_mode dev --dump_path ${OUT_DIR}/dev.json \
+TEST_CONFIG="--eval_batch_size ${BATCH} --pre_path ${CKPT_DIR}/model/checkpoint_best.pt --data_mode dev --dump_path ${OUT_DIR}/dev.json \
              --inf_path ${DATA_DIR}/drop_dataset_dev.json"
 
 CODE_DIR=.
