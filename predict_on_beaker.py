@@ -46,6 +46,11 @@ def load_dataset_mounts(train_experiment_name: str, evaluation_filepath: str) ->
         "subPath": file_name,
         "containerPath": f"/input/drop_dataset_dev.json"
     })
+    beaker_dataset_mounts.append({ # mount dev on train.jsonl because numnet code needs something there.
+        "datasetId": dataset_id,
+        "subPath": file_name,
+        "containerPath": f"/input/drop_dataset_train.json"
+    })
 
     return beaker_dataset_mounts
 
