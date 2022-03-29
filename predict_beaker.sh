@@ -25,6 +25,8 @@ echo "Starting evaluation..."
 TEST_CONFIG="--eval_batch_size ${BATCH} --pre_path ${CKPT_DIR}/checkpoint_best.pt --data_mode dev --dump_path ${OUT_DIR}/dev.json \
              --inf_path ${DATA_DIR}/drop_dataset_dev.json"
 
+CODE_DIR=.
+
 python ${CODE_DIR}/roberta_predict.py \
     ${DATA_CONFIG} \
     ${TEST_CONFIG} \
