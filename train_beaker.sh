@@ -45,12 +45,11 @@ else
   touch ${SAVE_DIR}/is_mspan.txt
 fi
 
+
+PRE_PATH=""
 if test -f "${CKPT_DIR}/model/checkpoint_best.pt"; then
     echo "Found a pretrained checkpoint."
     PRE_PATH="--pre_path ${CKPT_DIR}/model/checkpoint_best.pt"
-else
-    echo "Found no pretrained checkpoint."
-    PRE_PATH=""
 fi
 
 DATA_CONFIG="--data_dir ${CACHE_DIR} --save_dir ${SAVE_DIR}"
