@@ -4,7 +4,7 @@ set -xe
 
 BATCH=16
 
-if test -f "${CKPT_DIR}/is_tag_mspan.txt"; then
+if test -f "${CKPT_DIR}/model/is_tag_mspan.txt"; then
   echo "Use tag_mspan model..."
   MODEL_CONFIG="--gcn_steps 3 --use_gcn --tag_mspan"
   echo "Preparing cached data."
