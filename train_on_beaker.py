@@ -23,11 +23,7 @@ from beaker_scripts.util import (
 from processing_scripts.lib import read_jsonl, write_jsonl, hash_object, clean_white_space, split_list
 
 
-def load_dataset_mounts(
-        train_filepath: str,
-        dev_filepath: str,
-        working_dir="/run",
-    ) -> List[Dict]:
+def load_dataset_mounts(train_filepath: str, dev_filepath: str) -> List[Dict]:
 
     # Setup Model Mount
     beaker_dataset_mounts = [{
@@ -58,20 +54,14 @@ def load_dataset_mounts(
     return beaker_dataset_mounts
 
 
-def make_beaker_experiment_name(
-        command: str, train_filepath: str, dev_filepath: str
-    ) -> str:
-    hash_ = hash_object(command+train_filepath+dev_filepath)[:10]
-    experiment_name = "train_numnetplusv2_" + hash_
+def make_beaker_experiment_name(experiment_name: str) -> str:
+    hash_ = hash_object(experiment_name)[:10]
+    experiment_name = "train_numnetplusv2_" + experiment_name[:80] + "__" + hash_
     return experiment_name
 
 
-def make_beaker_experiment_description(
-        train_filepath: str, dev_filepath: str
-    ) -> str:
-    experiment_description = (
-        f"Numnetplusv2: Train on {train_filepath}. Dev on {dev_filepath}"
-    )
+def make_beaker_experiment_description(experiment_name: str) -> str:
+    experiment_description = f"Numnetplusv2: Train config {experiment_name}"
     return experiment_description
 
 
@@ -127,7 +117,6 @@ def main():
     with open(CONFIGS_FILEPATH) as file:
         configs = json.load(file)
 
-    working_dir = configs.pop("working_dir")
     beaker_workspace = configs.pop("beaker_workspace")
 
     # Prepare Dataset Mounts
@@ -152,9 +141,8 @@ def main():
         arguments.pop()
 
     # Prepare Experiment Config
-    command = " ".join(arguments)
-    beaker_experiment_name = make_beaker_experiment_name(command, train_filepath, dev_filepath)
-    beaker_experiment_description = make_beaker_experiment_description(train_filepath, dev_filepath)
+    beaker_experiment_name = make_beaker_experiment_name(args.experiment_name)
+    beaker_experiment_description = make_beaker_experiment_description(args.experiment_name)
 
     task_config = {
          "spec": {

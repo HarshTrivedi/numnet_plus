@@ -17,6 +17,7 @@ from beaker_scripts.util import (
     dataset_name_to_id, image_name_to_id
 )
 
+from train_on_beaker import make_beaker_experiment_name as make_train_beaker_experiment_name
 from processing_scripts.lib import hash_object
 
 
@@ -49,17 +50,13 @@ def load_dataset_mounts(train_experiment_name: str, evaluation_filepath: str) ->
     return beaker_dataset_mounts
 
 
-def make_beaker_experiment_name(
-        command: str, evaluation_filepath: str
-    ) -> str:
-    hash_ = hash_object(command+evaluation_filepath)[:10]
-    experiment_name = "predict_numnetplusv2_" + hash_
+def make_beaker_experiment_name(experiment_name: str, evaluation_filepath: str) -> str:
+    hash_ = hash_object(experiment_name+evaluation_filepath)[:10]
+    experiment_name = "predict_numnetplusv2_" + experiment_name[:80] + "__" + hash_
     return experiment_name
 
 
-def make_beaker_experiment_description(
-        train_experiment_name: str, evaluation_filepath: str
-    ) -> str:
+def make_beaker_experiment_description(train_experiment_name: str, evaluation_filepath: str) -> str:
     experiment_description = (
         f"Numnetplusv2: Predict on {evaluation_filepath} based on trained model : {train_experiment_name}"
     )
@@ -113,6 +110,7 @@ def main():
     beaker_workspace = configs.pop("beaker_workspace")
 
     # Prepare Dataset Mounts
+    train_experiment_name = make_train_beaker_experiment_name(args.experiment_name)
     dataset_mounts = load_dataset_mounts(train_experiment_name, args.evaluation_filepath)
 
     image_prefix = "numnetplusv2"
@@ -127,9 +125,8 @@ def main():
     arguments = ["sh", "predict_beaker.sh"]
 
     # Prepare Experiment Config
-    command = " ".join(arguments)
-    beaker_experiment_name = make_beaker_experiment_name(command, train_filepath, dev_filepath)
-    beaker_experiment_description = make_beaker_experiment_description(train_filepath, dev_filepath)
+    beaker_experiment_name = make_beaker_experiment_name(args.experiment_name, args.evaluation_filepath)
+    beaker_experiment_description = make_beaker_experiment_description(args.experiment_name, args.evaluation_filepath)
 
     task_config = {
          "spec": {
