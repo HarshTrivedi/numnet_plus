@@ -10,14 +10,12 @@ if test -f "${CKPT_DIR}/is_tag_mspan.txt"; then
   echo "Preparing cached data."
   python prepare_roberta_data.py --input_path ${DATA_DIR} --output_dir ${DATA_DIR} --model_path ${MODEL_DIR} --tag_mspan
   CACHE_DIR=${DATA_DIR}
-  fi
 else
   echo "Use mspan model..."
   MODEL_CONFIG="--gcn_steps 3 --use_gcn"
   echo "Preparing cached data."
   python prepare_roberta_data.py --input_path ${DATA_DIR} --output_dir ${DATA_DIR} --model_path ${MODEL_DIR}
   CACHE_DIR=${DATA_DIR}
-  fi
 fi
 
 DATA_CONFIG="--data_dir ${CACHE_DIR} --save_dir ${OUT_DIR}"
