@@ -165,9 +165,9 @@ def main():
              "datasetMounts": dataset_mounts,
              "requirements": {"gpuCount": 1},
              "env": {
-                 "DATA_DIR": "/input/",
-                 "MODEL_DIR": "/model/",
-                 "OUT_DIR": "/output/",
+                 "DATA_DIR": "/input",
+                 "MODEL_DIR": "/model",
+                 "OUT_DIR": "/output",
              }
          },
          "name": beaker_experiment_name,

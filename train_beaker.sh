@@ -14,6 +14,9 @@ TMSPAN=$9
 
 CODE_DIR=.
 
+SAVE_DIR=${OUT_DIR}/model
+mkdir SAVE_DIR
+
 if [ ${TMSPAN} = tag_mspan ];then
   echo "Use tag_mspan model..."
   CACHED_TRAIN=${DATA_DIR}/tmspan_cached_roberta_train.pkl
@@ -26,7 +29,7 @@ if [ ${TMSPAN} = tag_mspan ];then
   else
   CACHE_DIR=${DATA_DIR}
   fi
-  touch ${MODEL_DIR}/is_tag_mspan.txt
+  touch ${SAVE_DIR}/is_tag_mspan.txt
 else
   echo "Use mspan model..."
   CACHED_TRAIN=${DATA_DIR}/cached_roberta_train.pkl
@@ -39,11 +42,10 @@ else
   else
   CACHE_DIR=${DATA_DIR}
   fi
-  touch ${MODEL_DIR}/is_mspan.txt
+  touch ${SAVE_DIR}/is_mspan.txt
 fi
 
 
-SAVE_DIR=${OUT_DIR}/model
 DATA_CONFIG="--data_dir ${CACHE_DIR} --save_dir ${SAVE_DIR}"
 TRAIN_CONFIG="--batch_size ${BATCH} --eval_batch_size ${BATCH} --max_epoch ${EPOCHS} --warmup 0.06 --optimizer adam \
               --learning_rate ${LR} --weight_decay ${WD} --seed ${SEED} --gradient_accumulation_steps ${GRAD} \
