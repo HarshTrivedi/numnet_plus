@@ -15,7 +15,7 @@ TMSPAN=$9
 CODE_DIR=.
 
 SAVE_DIR=${OUT_DIR}/model
-mkdir SAVE_DIR
+mkdir ${SAVE_DIR}
 
 if [ ${TMSPAN} = tag_mspan ];then
   echo "Use tag_mspan model..."
