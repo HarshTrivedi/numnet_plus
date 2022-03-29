@@ -18,7 +18,6 @@ options.add_bert_args(parser)
 options.add_model_args(parser)
 options.add_data_args(parser)
 options.add_train_args(parser)
-parser.add_argument("--pre_path", type=str, help="Prepath")
 
 args = parser.parse_args()
 
