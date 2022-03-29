@@ -46,16 +46,18 @@ else
 fi
 
 
-PRE_PATH=""
 if test -f "${CKPT_DIR}/model/checkpoint_best.pt"; then
     echo "Found a pretrained checkpoint."
     PRE_PATH="--pre_path ${CKPT_DIR}/model/checkpoint_best.pt"
+else
+    PRE_PATH=""
+    echo "Found no pretrained checkpoint."
 fi
 
 DATA_CONFIG="--data_dir ${CACHE_DIR} --save_dir ${SAVE_DIR}"
 TRAIN_CONFIG="--batch_size ${BATCH} --eval_batch_size ${BATCH} --max_epoch ${EPOCHS} --warmup 0.06 --optimizer adam \
               --learning_rate ${LR} --weight_decay ${WD} --seed ${SEED} --gradient_accumulation_steps ${GRAD} \
-              --bert_learning_rate ${BLR} --bert_weight_decay ${BWD} --log_per_updates 100 --eps 1e-6 {PRE_PATH}"
+              --bert_learning_rate ${BLR} --bert_weight_decay ${BWD} --log_per_updates 100 --eps 1e-6 ${PRE_PATH}"
 BERT_CONFIG="--roberta_model ${MODEL_DIR}"
 
 
