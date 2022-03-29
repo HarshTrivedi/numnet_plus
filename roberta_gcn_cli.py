@@ -18,6 +18,7 @@ options.add_bert_args(parser)
 options.add_model_args(parser)
 options.add_data_args(parser)
 options.add_train_args(parser)
+parser.add_argument("--pre_path", type=str, help="Prepath")
 
 args = parser.parse_args()
 
@@ -65,6 +66,13 @@ def main():
                                               dropout_prob=args.dropout,
                                               use_gcn=args.use_gcn,
                                               gcn_steps=args.gcn_steps)
+
+    if args.cuda:
+        network.cuda()
+    if args.pre_path:
+        # To allow fine-tuning model starting from a given checkpoint.
+        print("Load from pre path {}.".format(args.pre_path))
+        network.load_state_dict(torch.load(args.pre_path))
 
     logger.info("Build optimizer etc...")
     model = DropBertModel(args, network, num_train_step=num_train_steps)

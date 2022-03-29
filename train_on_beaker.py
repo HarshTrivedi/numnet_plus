@@ -23,13 +23,22 @@ from beaker_scripts.util import (
 from processing_scripts.lib import read_jsonl, write_jsonl, hash_object, clean_white_space, split_list
 
 
-def load_dataset_mounts(train_filepath: str, dev_filepath: str) -> List[Dict]:
+def load_dataset_mounts(train_filepath: str, dev_filepath: str, pretrain_experiment_name: str = None) -> List[Dict]:
 
     # Setup Model Mount
     beaker_dataset_mounts = [{
         "datasetId": "tushark/numnet_roberta",
         "containerPath": "/model",
     }]
+
+    # Mount pretraining experiment dir so that archive can be found
+    if pretrain_experiment_name:
+        experiment_details = subprocess.check_output([
+            "beaker", "experiment", "inspect", "--format", "json", "harsh-trivedi/"+pretrain_experiment_name
+        ]).strip()
+        experiment_details = json.loads(experiment_details)
+        trained_model_dataset_id = experiment_details[0]["executions"][-1]["result"]["beaker"]
+        beaker_dataset_mounts.append({"datasetId": trained_model_dataset_id, "containerPath": f"/ckpt/"})
 
     # Setup Train file mount
     dataset_name = safe_create_dataset(train_filepath)
@@ -69,6 +78,7 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('experiment_name', type=str, help="Experiment name.")
+    parser.add_argument('--pretrain_experiment_name', type=str, help="Pretrain experiment name.", default=None)
     parser.add_argument(
         '--cluster', type=str,
         choices={"v100", "onperm-aristo", "onperm-ai2", "onperm-mosaic", "cpu"},
@@ -120,7 +130,10 @@ def main():
     beaker_workspace = configs.pop("beaker_workspace")
 
     # Prepare Dataset Mounts
-    dataset_mounts = load_dataset_mounts(train_filepath, dev_filepath)
+    pretrain_experiment_name = None
+    if args.pretrain_experiment_name:
+        pretrain_experiment_name = make_beaker_experiment_name(args.pretrain_experiment_name)
+    dataset_mounts = load_dataset_mounts(train_filepath, dev_filepath, pretrain_experiment_name)
 
     image_prefix = "numnetplusv2"
     beaker_image = prepare_beaker_image(
@@ -155,6 +168,7 @@ def main():
              "env": {
                  "DATA_DIR": "/input",
                  "MODEL_DIR": "/model",
+                 "CKPT_DIR": "/ckpt/",
                  "OUT_DIR": "/output",
              }
          },
