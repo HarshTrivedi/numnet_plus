@@ -88,7 +88,7 @@ def main():
         logger.info('At epoch {}'.format(epoch))
         logger.info('Number of batches in this epoch: {}'.format(num_batches_per_epoch))
         for step in range(num_batches_per_epoch):
-            batch = train_itr.next()
+            batch = next(train_itr)
             model.update(batch)
             if model.step % (args.log_per_updates * args.gradient_accumulation_steps) == 0 or model.step == 1:
                 logger.info("Updates[{0:6}] train loss[{1:.5f}] train em[{2:.5f}] f1[{3:.5f}] remaining[{4}]".format(
