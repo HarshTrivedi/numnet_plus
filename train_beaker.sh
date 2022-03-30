@@ -4,13 +4,14 @@ set -xe
 
 SEED=$1
 EPOCHS=$2
-LR=$3
-BLR=$4
-WD=$5
-BWD=$6
-BATCH=$7
-GRAD=$8
-TMSPAN=$9
+NUM_INSTANCES=$3
+LR=$4
+BLR=$5
+WD=$6
+BWD=$7
+BATCH=$8
+GRAD=$9
+TMSPAN=$10
 
 CODE_DIR=.
 
@@ -55,9 +56,10 @@ else
 fi
 
 DATA_CONFIG="--data_dir ${CACHE_DIR} --save_dir ${SAVE_DIR}"
-TRAIN_CONFIG="--batch_size ${BATCH} --eval_batch_size ${BATCH} --max_epoch ${EPOCHS} --warmup 0.06 --optimizer adam \
-              --learning_rate ${LR} --weight_decay ${WD} --seed ${SEED} --gradient_accumulation_steps ${GRAD} \
-              --bert_learning_rate ${BLR} --bert_weight_decay ${BWD} --log_per_updates 100 --eps 1e-6 ${PRE_PATH}"
+TRAIN_CONFIG="--batch_size ${BATCH} --eval_batch_size ${BATCH} --max_epoch ${EPOCHS} --num_instances_per_epoch {NUM_INSTANCES} \
+              --warmup 0.06 --optimizer adam  --learning_rate ${LR} --weight_decay ${WD} --seed ${SEED} \
+              --gradient_accumulation_steps ${GRAD} --bert_learning_rate ${BLR} --bert_weight_decay ${BWD} \
+              --log_per_updates 100 --eps 1e-6 ${PRE_PATH}"
 BERT_CONFIG="--roberta_model ${MODEL_DIR}"
 
 

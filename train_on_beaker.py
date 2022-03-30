@@ -106,6 +106,7 @@ def main():
 
     random_seed = experiment_config.get("random_seed", 345)
     epochs = experiment_config.get("epochs", 5)
+    num_instances_per_epoch = experiment_config.get("num_instances_per_epoch", None)
     learning_rate = experiment_config.get("learning_rate", 5e-4)
     bert_learning_rate = experiment_config.get("bert_learning_rate", 1.5e-5)
     weight_decay = experiment_config.get("weight_decay", 5e-5)
@@ -147,8 +148,8 @@ def main():
 
     arguments = [
         "sh", "train_beaker.sh",
-        str(random_seed), str(epochs), str(learning_rate), str(bert_learning_rate), str(weight_decay),
-        str(bert_weight_decay), str(batch_size), str(gradient_accum), "tag_mspan"
+        str(random_seed), str(epochs), str(num_instances_per_epoch), str(learning_rate), str(bert_learning_rate),
+        str(weight_decay), str(bert_weight_decay), str(batch_size), str(gradient_accum), "tag_mspan"
     ]
     if skip_tagging:
         arguments.pop()
