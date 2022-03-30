@@ -57,7 +57,7 @@ COPY numnet_plus/cache_data_beaker.sh cache_data_beaker.sh
 COPY numnet_plus/train_on_beaker.py train_on_beaker.py
 COPY numnet_plus/cache_data_on_beaker.py cache_data_on_beaker.py
 COPY numnet_plus/predict_on_beaker.py predict_on_beaker.py
-COPY numnet_plus/.project-wandb-config.json .project-wandb-config.json
+COPY .project-wandb-config.json .project-wandb-config.json
 
 CMD ["/bin/bash"]
 
