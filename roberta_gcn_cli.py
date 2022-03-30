@@ -49,6 +49,7 @@ def main():
 
     if args.num_instances_per_epoch in (None, "None", "none", "null", "Null"):
         args.num_instances_per_epoch = len(train_itr) * args.batch_size
+    args.num_instances_per_epoch = int(args.num_instances_per_epoch)
     num_batches_per_epoch = int(int(args.num_instances_per_epoch) / args.batch_size)
 
     num_train_steps = int(args.max_epoch * args.num_instances_per_epoch / args.gradient_accumulation_steps)
@@ -83,12 +84,13 @@ def main():
 
     train_start = datetime.now()
 
+    train_iterator = iter(train_itr)
     for epoch in range(1, args.max_epoch + 1):
         model.avg_reset()
         logger.info('At epoch {}'.format(epoch))
         logger.info('Number of batches in this epoch: {}'.format(num_batches_per_epoch))
         for step in range(num_batches_per_epoch):
-            batch = next(train_itr)
+            batch = next(train_iterator)
             model.update(batch)
             if model.step % (args.log_per_updates * args.gradient_accumulation_steps) == 0 or model.step == 1:
                 logger.info("Updates[{0:6}] train loss[{1:.5f}] train em[{2:.5f}] f1[{3:.5f}] remaining[{4}]".format(
