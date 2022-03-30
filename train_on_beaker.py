@@ -22,6 +22,7 @@ from beaker_scripts.util import (
 )
 
 from processing_scripts.lib import read_jsonl, write_jsonl, hash_object, clean_white_space, split_list
+from cache_data_on_beaker import make_beaker_experiment_name as make_cache_data_beaker_experiment_name
 
 
 def load_dataset_mounts(cached_data_experiment_name: str, pretrain_experiment_name: str = None) -> List[Dict]:
@@ -42,9 +43,12 @@ def load_dataset_mounts(cached_data_experiment_name: str, pretrain_experiment_na
         beaker_dataset_mounts.append({"datasetId": trained_model_dataset_id, "containerPath": f"/ckpt/"})
 
     # Setup cached train and dev files
-    experiment_details = subprocess.check_output([
-        "beaker", "experiment", "inspect", "--format", "json", "harsh-trivedi/"+cached_data_experiment_name
-    ]).strip()
+    try:
+        experiment_details = subprocess.check_output([
+            "beaker", "experiment", "inspect", "--format", "json", "harsh-trivedi/"+cached_data_experiment_name
+        ]).strip()
+    except:
+        exit(f"Cached data experiment not found harsh-trivedi{cached_data_experiment_name}.")
     experiment_details = json.loads(experiment_details)
     cached_data_dataset_id = experiment_details[0]["executions"][-1]["result"]["beaker"]
     beaker_dataset_mounts.append({"datasetId": cached_data_dataset_id, "containerPath": f"/cache/"})
