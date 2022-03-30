@@ -2,6 +2,8 @@ import os
 import pickle
 import torch
 import random
+from tqdm import tqdm
+
 
 class DropBatchGen(object):
     def __init__(self, args, data_mode, tokenizer, padding_idx=1, make_infinite=False):
@@ -18,7 +20,7 @@ class DropBatchGen(object):
             data = pickle.load(f)
 
         all_data = []
-        for item in data:
+        for item in tqdm(data):
             question_tokens = tokenizer.convert_tokens_to_ids(item["question_tokens"])
             passage_tokens = tokenizer.convert_tokens_to_ids(item["passage_tokens"])
             all_data.append((question_tokens, passage_tokens, item))
