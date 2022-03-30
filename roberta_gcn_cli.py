@@ -55,6 +55,8 @@ def maybe_track_wandb(project_name: str = "synth2realmh"):
             wandb.init(project=project_name, name=wandb_run_name)
 
 def main():
+    maybe_track_wandb()
+
     best_result = float("-inf")
     logger.info("Loading data...")
     if not args.tag_mspan:
