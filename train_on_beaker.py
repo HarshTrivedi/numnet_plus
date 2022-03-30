@@ -10,6 +10,7 @@ import os
 import sys
 from datetime import datetime
 from typing import List, Dict
+import uuid
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 
@@ -165,6 +166,7 @@ def main():
     # Prepare Experiment Config
     beaker_experiment_name = make_beaker_experiment_name(args.experiment_name)
     beaker_experiment_description = make_beaker_experiment_description(args.experiment_name)
+    wandb_run_name = uuid.uuid4().hex
 
     task_config = {
          "spec": {
@@ -180,6 +182,7 @@ def main():
                  "CKPT_DIR": "/ckpt",
                  "OUT_DIR": "/output",
                  "CACHE_DIR": "/cache",
+                 "WANDB_RUN_NAME": wandb_run_name,
              }
          },
          "name": beaker_experiment_name,

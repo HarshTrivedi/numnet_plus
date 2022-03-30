@@ -37,6 +37,7 @@ RUN pip install torch==1.7.1+cu110 -f https://download.pytorch.org/whl/torch_sta
 
 RUN pip install -U scikit-learn
 RUN pip install overrides==3.1.0
+RUN pip install wandb
 
 # Copy remaining code.
 COPY numnet_plus/drop_eval.py drop_eval.py
@@ -56,6 +57,7 @@ COPY numnet_plus/cache_data_beaker.sh cache_data_beaker.sh
 COPY numnet_plus/train_on_beaker.py train_on_beaker.py
 COPY numnet_plus/cache_data_on_beaker.py cache_data_on_beaker.py
 COPY numnet_plus/predict_on_beaker.py predict_on_beaker.py
+COPY numnet_plus/.project-wandb-config.json .project-wandb-config.json
 
 CMD ["/bin/bash"]
 

@@ -37,6 +37,23 @@ logger = create_logger("Bert Drop Pretraining", log_file=os.path.join(args.save_
 pprint(args)
 set_environment(args.seed, args.cuda)
 
+
+def maybe_track_wandb(project_name: str = "synth2realmh"):
+    import wandb
+    wandb_run_name = os.environ.get("WANDB_RUN_NAME", None)
+    wandb_api_key_path = ".project-wandb-config.json"
+    print("Trying to setup wandb...")
+    if not os.path.exists(wandb_api_key_path):
+        print("Wandb API key not found.")
+    if not wandb_run_name:
+        print("Wandb run_name not found.")
+    if os.path.exists(wandb_api_key_path) and wandb_run_name is not None:
+        with open(wandb_api_key_path, "r") as file:
+            print("Starting wandb.")
+            wandb_api_key = json.load(file)["wandb_api_key"]
+            wandb.login(key=wandb_api_key)
+            wandb.init(project=project_name, name=wandb_run_name)
+
 def main():
     best_result = float("-inf")
     logger.info("Loading data...")
