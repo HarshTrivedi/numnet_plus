@@ -13,7 +13,7 @@ def add_train_args(parser: ArgumentParser):
                         help="Number of updates steps to accumulate before performing a backward/update pass.")
     parser.add_argument("--log_per_updates", default=20, type=int, help="log pre update size.")
     parser.add_argument("--max_epoch", default=5, type=int, help="max epoch.")
-    parser.add_argument("--num_instances_per_epoch", default=None, type=int, help="number of instances per epoch.")
+    parser.add_argument("--num_instances_per_epoch", default=None, help="number of instances per epoch.")
     parser.add_argument("--weight_decay", default=0.01, type=float, help="weight decay.")
     parser.add_argument("--learning_rate", default=5e-5, type=float, help="learning rate.")
     parser.add_argument("--grad_clipping", default=1.0, type=float, help="gradient clip.")
