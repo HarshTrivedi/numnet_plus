@@ -41,12 +41,17 @@ def main():
     best_result = float("-inf")
     logger.info("Loading data...")
     if not args.tag_mspan:
-        train_itr = DropBatchGen(args, data_mode="train", tokenizer=tokenizer)
+        train_itr = DropBatchGen(args, data_mode="train", tokenizer=tokenizer, make_infinite=True)
         dev_itr = DropBatchGen(args, data_mode="dev", tokenizer=tokenizer)
     else:
-        train_itr = TDropBatchGen(args, data_mode="train", tokenizer=tokenizer)
+        train_itr = TDropBatchGen(args, data_mode="train", tokenizer=tokenizer, make_infinite=True)
         dev_itr = TDropBatchGen(args, data_mode="dev", tokenizer=tokenizer)
-    num_train_steps = int(args.max_epoch * len(train_itr) / args.gradient_accumulation_steps)
+
+    if args.num_instances_per_epoch is not None:
+        args.num_instances_per_epoch = len(train_itr) * args.batch_size
+    num_batches_per_epoch = args.num_instances_per_epoch / args.batch_size
+
+    num_train_steps = int(args.max_epoch * args.num_instances_per_epoch / args.gradient_accumulation_steps)
     logger.info("Num update steps {}!".format(num_train_steps))
 
     logger.info("Build bert model.")
@@ -77,15 +82,12 @@ def main():
     model = DropBertModel(args, network, num_train_step=num_train_steps)
 
     train_start = datetime.now()
-    first = True
 
     for epoch in range(1, args.max_epoch + 1):
         model.avg_reset()
-        if not first:
-            train_itr.reset()
-        first = False
         logger.info('At epoch {}'.format(epoch))
-        for step, batch in enumerate(train_itr):
+        for step in range(num_batches_per_epoch):
+            batch = train_itr.next()
             model.update(batch)
             if model.step % (args.log_per_updates * args.gradient_accumulation_steps) == 0 or model.step == 1:
                 logger.info("Updates[{0:6}] train loss[{1:.5f}] train em[{2:.5f}] f1[{3:.5f}] remaining[{4}]".format(

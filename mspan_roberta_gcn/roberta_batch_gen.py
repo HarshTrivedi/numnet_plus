@@ -4,13 +4,14 @@ import torch
 import random
 
 class DropBatchGen(object):
-    def __init__(self, args, data_mode, tokenizer, padding_idx=1):
+    def __init__(self, args, data_mode, tokenizer, padding_idx=1, make_infinite=False):
         self.args = args
         self.cls_idx = tokenizer.convert_tokens_to_ids(tokenizer.cls_token)
         self.sep_idx = tokenizer.convert_tokens_to_ids(tokenizer.sep_token)
         self.padding_idx = padding_idx
         self.is_train = data_mode == "train"
         self.vocab_size = len(tokenizer)
+        self.make_infinite = make_infinite
         dpath = "cached_roberta_{}.pkl".format(data_mode)
         with open(os.path.join(args.data_dir, dpath), "rb") as f:
             print("Load data from {}.".format(dpath))
@@ -51,7 +52,15 @@ class DropBatchGen(object):
         return len(self.data)
 
     def __iter__(self):
-        while self.offset < len(self):
+
+        while True:
+
+            if self.offset >= len(self):
+                if self.make_infinite:
+                    self.reset()
+                else:
+                    break
+
             batch = self.data[self.offset]
             self.offset += 1
             q_tokens, p_tokens, metas = zip(*batch)
