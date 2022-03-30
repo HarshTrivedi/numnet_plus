@@ -3,6 +3,7 @@ A script to dockerize a script for parallel processing of it on beaker.
 """
 import math
 import json
+import _jsonnet
 import argparse
 import subprocess
 import os
@@ -98,8 +99,7 @@ def main():
     experiment_config_path = os.path.join(
         "numnet_plus", "experiment_configs", args.experiment_name + ".jsonnet"
     )
-    with open(experiment_config_path, "r") as file:
-        experiment_config = json.load(file)
+    experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_path))
 
     train_filepath = experiment_config.pop("train_filepath")
     dev_filepath = experiment_config.pop("dev_filepath")
