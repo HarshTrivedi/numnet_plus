@@ -49,7 +49,7 @@ def main():
 
     if args.num_instances_per_epoch in (None, "None", "none", "null", "Null"):
         args.num_instances_per_epoch = len(train_itr) * args.batch_size
-    num_batches_per_epoch = int(args.num_instances_per_epoch) / args.batch_size
+    num_batches_per_epoch = int(int(args.num_instances_per_epoch) / args.batch_size)
 
     num_train_steps = int(args.max_epoch * args.num_instances_per_epoch / args.gradient_accumulation_steps)
     logger.info("Num update steps {}!".format(num_train_steps))
