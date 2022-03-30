@@ -41,9 +41,11 @@ def main():
     best_result = float("-inf")
     logger.info("Loading data...")
     if not args.tag_mspan:
+        logger.info("Loading data without tag_mspan.")
         train_itr = DropBatchGen(args, data_mode="train", tokenizer=tokenizer, make_infinite=True)
         dev_itr = DropBatchGen(args, data_mode="dev", tokenizer=tokenizer)
     else:
+        logger.info("Loading data with tag_mspan.")
         train_itr = TDropBatchGen(args, data_mode="train", tokenizer=tokenizer, make_infinite=True)
         dev_itr = TDropBatchGen(args, data_mode="dev", tokenizer=tokenizer)
 

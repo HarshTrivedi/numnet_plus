@@ -18,7 +18,7 @@ CODE_DIR=.
 SAVE_DIR=${OUT_DIR}/model
 mkdir ${SAVE_DIR}
 
-if [ ${TMSPAN} = tag_mspan ];then
+if [ ${TMSPAN} == tag_mspan ];then
   echo "Use tag_mspan model..."
   CACHED_TRAIN=${DATA_DIR}/tmspan_cached_roberta_train.pkl
   CACHED_DEV=${DATA_DIR}/tmspan_cached_roberta_dev.pkl
@@ -31,6 +31,7 @@ if [ ${TMSPAN} = tag_mspan ];then
   CACHE_DIR=${DATA_DIR}
   fi
   touch ${SAVE_DIR}/is_tag_mspan.txt
+  TMSPAN_FLG="--tag_mspan"
 else
   echo "Use mspan model..."
   CACHED_TRAIN=${DATA_DIR}/cached_roberta_train.pkl
@@ -44,6 +45,7 @@ else
   CACHE_DIR=${DATA_DIR}
   fi
   touch ${SAVE_DIR}/is_mspan.txt
+  TMSPAN_FLG=""
 fi
 
 
@@ -59,7 +61,7 @@ DATA_CONFIG="--data_dir ${CACHE_DIR} --save_dir ${SAVE_DIR}"
 TRAIN_CONFIG="--batch_size ${BATCH} --eval_batch_size ${BATCH} --max_epoch ${EPOCHS} --num_instances_per_epoch ${NUM_INSTANCES} \
               --warmup 0.06 --optimizer adam  --learning_rate ${LR} --weight_decay ${WD} --seed ${SEED} \
               --gradient_accumulation_steps ${GRAD} --bert_learning_rate ${BLR} --bert_weight_decay ${BWD} \
-              --log_per_updates 100 --eps 1e-6 ${PRE_PATH}"
+              --log_per_updates 100 --eps 1e-6 ${TMSPAN_FLG} ${PRE_PATH}"
 BERT_CONFIG="--roberta_model ${MODEL_DIR}"
 
 
