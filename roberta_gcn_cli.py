@@ -47,7 +47,7 @@ def main():
         train_itr = TDropBatchGen(args, data_mode="train", tokenizer=tokenizer, make_infinite=True)
         dev_itr = TDropBatchGen(args, data_mode="dev", tokenizer=tokenizer)
 
-    if args.num_instances_per_epoch is not in (None, "None", "none", "null", "Null"):
+    if args.num_instances_per_epoch in (None, "None", "none", "null", "Null"):
         args.num_instances_per_epoch = len(train_itr) * args.batch_size
     num_batches_per_epoch = args.num_instances_per_epoch / args.batch_size
 
