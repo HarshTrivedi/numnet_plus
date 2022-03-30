@@ -101,19 +101,22 @@ def main():
     with open(experiment_config_path, "r") as file:
         experiment_config = json.load(file)
 
-    train_filepath = experiment_config["train_filepath"]
-    dev_filepath = experiment_config["dev_filepath"]
+    train_filepath = experiment_config.pop("train_filepath")
+    dev_filepath = experiment_config.pop("dev_filepath")
 
-    random_seed = experiment_config.get("random_seed", 345)
-    epochs = experiment_config.get("epochs", 5)
-    num_instances_per_epoch = experiment_config.get("num_instances_per_epoch", None)
-    learning_rate = experiment_config.get("learning_rate", 5e-4)
-    bert_learning_rate = experiment_config.get("bert_learning_rate", 1.5e-5)
-    weight_decay = experiment_config.get("weight_decay", 5e-5)
-    bert_weight_decay = experiment_config.get("bert_weight_decay", 0.01)
-    batch_size = experiment_config.get("batch_size", 16)
-    gradient_accum = experiment_config.get("gradient_accum", 8)
-    skip_tagging = experiment_config.get("skip_tagging", False)
+    random_seed = experiment_config.pop("random_seed", 345)
+    epochs = experiment_config.pop("epochs", 5)
+    num_instances_per_epoch = experiment_config.pop("num_instances_per_epoch", None)
+    learning_rate = experiment_config.pop("learning_rate", 5e-4)
+    bert_learning_rate = experiment_config.pop("bert_learning_rate", 1.5e-5)
+    weight_decay = experiment_config.pop("weight_decay", 5e-5)
+    bert_weight_decay = experiment_config.pop("bert_weight_decay", 0.01)
+    batch_size = experiment_config.pop("batch_size", 16)
+    gradient_accum = experiment_config.pop("gradient_accum", 8)
+    skip_tagging = experiment_config.pop("skip_tagging", False)
+
+    if experiment_config:
+        exit(f"Some keys in experiment_config are not used: {experiment_config.keys()}")
 
     cluster_map = {
         "v100": "ai2/harsh-v100",
