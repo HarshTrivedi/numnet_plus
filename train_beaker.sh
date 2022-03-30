@@ -18,7 +18,7 @@ CODE_DIR=.
 SAVE_DIR=${OUT_DIR}/model
 mkdir ${SAVE_DIR}
 
-if [ ${TMSPAN} == tag_mspan ];then
+if [ ${TMSPAN} = tag_mspan ];then
   echo "Use tag_mspan model..."
   CACHED_TRAIN=${DATA_DIR}/tmspan_cached_roberta_train.pkl
   CACHED_DEV=${DATA_DIR}/tmspan_cached_roberta_dev.pkl
