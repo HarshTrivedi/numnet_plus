@@ -24,7 +24,7 @@ from beaker_scripts.util import (
 from processing_scripts.lib import read_jsonl, write_jsonl, hash_object, clean_white_space, split_list
 
 
-def load_dataset_mounts(train_filepath: str, dev_filepath: str, pretrain_experiment_name: str = None) -> List[Dict]:
+def load_dataset_mounts(cached_data_experiment_name: str, pretrain_experiment_name: str = None) -> List[Dict]:
 
     # Setup Model Mount
     beaker_dataset_mounts = [{
@@ -41,25 +41,13 @@ def load_dataset_mounts(train_filepath: str, dev_filepath: str, pretrain_experim
         trained_model_dataset_id = experiment_details[0]["executions"][-1]["result"]["beaker"]
         beaker_dataset_mounts.append({"datasetId": trained_model_dataset_id, "containerPath": f"/ckpt/"})
 
-    # Setup Train file mount
-    dataset_name = safe_create_dataset(train_filepath)
-    dataset_id = dataset_name_to_id(dataset_name)
-    file_name = os.path.basename(train_filepath)
-    beaker_dataset_mounts.append({
-        "datasetId": dataset_id,
-        "subPath": file_name,
-        "containerPath": f"/input/drop_dataset_train.json"
-    })
-
-    # Setup Dev file mount
-    dataset_name = safe_create_dataset(dev_filepath)
-    dataset_id = dataset_name_to_id(dataset_name)
-    file_name = os.path.basename(dev_filepath)
-    beaker_dataset_mounts.append({
-        "datasetId": dataset_id,
-        "subPath": file_name,
-        "containerPath": f"/input/drop_dataset_dev.json"
-    })
+    # Setup cached train and dev files
+    experiment_details = subprocess.check_output([
+        "beaker", "experiment", "inspect", "--format", "json", "harsh-trivedi/"+cached_data_experiment_name
+    ]).strip()
+    experiment_details = json.loads(experiment_details)
+    cached_data_dataset_id = experiment_details[0]["executions"][-1]["result"]["beaker"]
+    beaker_dataset_mounts.append({"datasetId": cached_data_dataset_id, "containerPath": f"/cache/"})
 
     return beaker_dataset_mounts
 
@@ -137,7 +125,10 @@ def main():
     pretrain_experiment_name = None
     if args.pretrain_experiment_name:
         pretrain_experiment_name = make_beaker_experiment_name(args.pretrain_experiment_name)
-    dataset_mounts = load_dataset_mounts(train_filepath, dev_filepath, pretrain_experiment_name)
+
+    assert skip_tagging in (True, False)
+    cache_data_experiment_name = make_cache_data_beaker_experiment_name(train_filepath, dev_filepath, skip_tagging)
+    dataset_mounts = load_dataset_mounts(cache_data_experiment_name, pretrain_experiment_name)
 
     image_prefix = "numnetplusv2"
     beaker_image = prepare_beaker_image(
@@ -172,8 +163,9 @@ def main():
              "env": {
                  "DATA_DIR": "/input",
                  "MODEL_DIR": "/model",
-                 "CKPT_DIR": "/ckpt/",
+                 "CKPT_DIR": "/ckpt",
                  "OUT_DIR": "/output",
+                 "CACHE_DIR": "/cache",
              }
          },
          "name": beaker_experiment_name,

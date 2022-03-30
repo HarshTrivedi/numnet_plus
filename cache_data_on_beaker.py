@@ -24,7 +24,7 @@ from beaker_scripts.util import (
 from processing_scripts.lib import read_jsonl, write_jsonl, hash_object, split_list
 
 
-def load_dataset_mounts(train_filepath: str, dev_filepath: str, pretrain_experiment_name: str = None) -> List[Dict]:
+def load_dataset_mounts(train_filepath: str, dev_filepath: str) -> List[Dict]:
 
     # Setup Model Mount
     beaker_dataset_mounts = [{
@@ -95,16 +95,16 @@ def main():
     train_filepath = experiment_config.pop("train_filepath")
     dev_filepath = experiment_config.pop("dev_filepath")
 
-    experiment_config.pop("random_seed")
-    experiment_config.pop("epochs")
-    experiment_config.pop("num_instances_per_epoch")
-    experiment_config.pop("learning_rate")
-    experiment_config.pop("bert_learning_rate")
-    experiment_config.pop("weight_decay")
-    experiment_config.pop("bert_weight_decay")
-    experiment_config.pop("batch_size")
-    experiment_config.pop("gradient_accum")
-    experiment_config.pop("skip_tagging")
+    experiment_config.pop("random_seed", None)
+    experiment_config.pop("epochs", None)
+    experiment_config.pop("num_instances_per_epoch", None)
+    experiment_config.pop("learning_rate", None)
+    experiment_config.pop("bert_learning_rate", None)
+    experiment_config.pop("weight_decay", None)
+    experiment_config.pop("bert_weight_decay", None)
+    experiment_config.pop("batch_size", None)
+    experiment_config.pop("gradient_accum", None)
+    skip_tagging = experiment_config.pop("skip_tagging", False)
 
     if experiment_config:
         exit(f"Some keys in experiment_config are not used: {experiment_config.keys()}")
@@ -125,10 +125,7 @@ def main():
     beaker_workspace = configs.pop("beaker_workspace")
 
     # Prepare Dataset Mounts
-    pretrain_experiment_name = None
-    if args.pretrain_experiment_name:
-        pretrain_experiment_name = make_beaker_experiment_name(args.pretrain_experiment_name)
-    dataset_mounts = load_dataset_mounts(train_filepath, dev_filepath, pretrain_experiment_name)
+    dataset_mounts = load_dataset_mounts(train_filepath, dev_filepath)
 
     image_prefix = "numnetplusv2"
     beaker_image = prepare_beaker_image(
