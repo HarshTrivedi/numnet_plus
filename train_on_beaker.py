@@ -25,7 +25,7 @@ from processing_scripts.lib import read_jsonl, write_jsonl, hash_object, clean_w
 from cache_data_on_beaker import make_beaker_experiment_name as make_cache_data_beaker_experiment_name
 
 
-def load_dataset_mounts(cached_data_experiment_name: str, pretrain_experiment_name: str = None) -> List[Dict]:
+def load_dataset_mounts(dev_filepath: str, cached_data_experiment_name: str, pretrain_experiment_name: str = None) -> List[Dict]:
 
     # Setup Model Mount
     beaker_dataset_mounts = [{
@@ -52,6 +52,16 @@ def load_dataset_mounts(cached_data_experiment_name: str, pretrain_experiment_na
     experiment_details = json.loads(experiment_details)
     cached_data_dataset_id = experiment_details[0]["executions"][-1]["result"]["beaker"]
     beaker_dataset_mounts.append({"datasetId": cached_data_dataset_id, "containerPath": f"/cache/"})
+
+    # Setup Dev file mount. This is required for final evaluation.
+    dataset_name = safe_create_dataset(dev_filepath)
+    dataset_id = dataset_name_to_id(dataset_name)
+    file_name = os.path.basename(dev_filepath)
+    beaker_dataset_mounts.append({
+        "datasetId": dataset_id,
+        "subPath": file_name,
+        "containerPath": f"/input/drop_dataset_dev.json"
+    })
 
     return beaker_dataset_mounts
 
@@ -132,7 +142,7 @@ def main():
 
     assert skip_tagging in (True, False)
     cache_data_experiment_name = make_cache_data_beaker_experiment_name(train_filepath, dev_filepath, skip_tagging)
-    dataset_mounts = load_dataset_mounts(cache_data_experiment_name, pretrain_experiment_name)
+    dataset_mounts = load_dataset_mounts(dev_filepath, cache_data_experiment_name, pretrain_experiment_name)
 
     image_prefix = "numnetplusv2"
     beaker_image = prepare_beaker_image(
