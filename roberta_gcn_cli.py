@@ -86,6 +86,7 @@ def main():
     for epoch in range(1, args.max_epoch + 1):
         model.avg_reset()
         logger.info('At epoch {}'.format(epoch))
+        logger.info('Number of batches in this epoch: {}'.format(num_batches_per_epoch))
         for step in range(num_batches_per_epoch):
             batch = train_itr.next()
             model.update(batch)
