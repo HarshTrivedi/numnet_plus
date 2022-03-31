@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 
 class DropBatchGen(object):
-    def __init__(self, args, data_mode, tokenizer, padding_idx=1, make_infinite=False, lazy=False, raw_data_path: str = None):
+    def __init__(self, args, data_mode, tokenizer, padding_idx=1, make_infinite=False, lazy=False):
         self.args = args
         self.cls_idx = tokenizer.convert_tokens_to_ids(tokenizer.cls_token)
         self.sep_idx = tokenizer.convert_tokens_to_ids(tokenizer.sep_token)
@@ -34,15 +34,16 @@ class DropBatchGen(object):
             self.data = DropBatchGen.make_batches(all_data, args.batch_size if self.is_train else args.eval_batch_size, self.is_train)
 
         else:
-            assert raw_data_path is not None
+            assert args.input_path is not None
 
             if args.model_path is None:
                 tokenizer = RobertaTokenizer.from_pretrained(args.input_path + "/roberta.large")
             else:
                 tokenizer = RobertaTokenizer.from_pretrained(args.model_path)
+
+            self.raw_data_path = os.path.join(args.input_path, f"drop_dataset_{data_mode}.json")
             self.reader = DropReader(tokenizer, args.passage_length_limit, args.question_length_limit)
-            self.raw_data_path = raw_data_path
-            self.data_len = self.reader.count_num_instances(raw_data_path)
+            self.data_len = self.reader.count_num_instances(self.raw_data_path)
 
         self.offset = 0
 
@@ -57,7 +58,7 @@ class DropBatchGen(object):
         return [data[i:i + batch_size] for i in range(0, len(data), batch_size)]
 
     def yield_batch(batch_size=32):
-        return [self.reader.yield_instance(raw_data_path) for _ in range(batch_size)]
+        return [self.reader.yield_instance(self.raw_data_path) for _ in range(batch_size)]
 
     def reset(self):
         if self.is_train:

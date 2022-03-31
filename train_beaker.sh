@@ -12,6 +12,7 @@ BWD=$7
 BATCH=$8
 GRAD=$9
 TMSPAN=${10}
+LAZY=${11}
 
 CODE_DIR=.
 
@@ -36,13 +37,20 @@ else
     echo "Found no pretrained checkpoint."
 fi
 
-DATA_CONFIG="--data_dir ${CACHE_DIR} --save_dir ${SAVE_DIR}"
+DATA_CONFIG="--data_dir ${CACHE_DIR} --save_dir ${SAVE_DIR} --input_path ${DATA_DIR} --model_path ${MODEL_DIR}"
 TRAIN_CONFIG="--batch_size ${BATCH} --eval_batch_size ${BATCH} --max_epoch ${EPOCHS} --num_instances_per_epoch ${NUM_INSTANCES} \
               --warmup 0.06 --optimizer adam  --learning_rate ${LR} --weight_decay ${WD} --seed ${SEED} \
               --gradient_accumulation_steps ${GRAD} --bert_learning_rate ${BLR} --bert_weight_decay ${BWD} \
               --log_per_updates 100 --eps 1e-6 ${PRE_PATH}"
 BERT_CONFIG="--roberta_model ${MODEL_DIR}"
 
+
+if [ ${LAZY} = true ];then
+    echo "Will process data lazily..."
+    DATA_CONFIG="{DATA_CONFIG} --lazy"
+else
+    echo "Will process cached data (not lazily)..."
+fi
 
 echo "Start training..."
 python ${CODE_DIR}/roberta_gcn_cli.py \

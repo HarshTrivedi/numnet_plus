@@ -8,6 +8,14 @@ def add_data_args(parser: ArgumentParser):
     parser.add_argument("--save_dir", default="", type=str, required=True, help="save dir.")
     parser.add_argument("--log_file", default="train.log", type=str, help="train log file.")
 
+    # Post-hoc added by me to hack support for lazy loading (Harsh). Taken from prepare_roberta_data.py.
+    parser.add_argument("--input_path", type=str, default=None)
+    parser.add_argument("--model_path", type=str, default=None)
+    parser.add_argument("--passage_length_limit", type=int, default=463)
+    parser.add_argument("--question_length_limit", type=int, default=46)
+    parser.add_argument("--lazy", action="store_true", help="load lazily.", default=False)
+
+
 def add_train_args(parser: ArgumentParser):
     parser.add_argument('--gradient_accumulation_steps', type=int, default=1,
                         help="Number of updates steps to accumulate before performing a backward/update pass.")
