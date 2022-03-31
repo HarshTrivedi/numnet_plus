@@ -220,8 +220,33 @@ class DropReader(object):
                 if "validated_answers" in question_answer:
                     answer_annotations += question_answer["validated_answers"]
 
-                instance = self.text_to_instance(question_text, passage_text, question_id, passage_id,
-                                                 answer_annotations)
+                # TODO: This should have been done in preprocessing itself.
+                def handle_le_ge_synth_replacements(question_text: str, answer_text: str) -> str:
+                    if answer_text not in ("<", ">"):
+                        return answer_text
+                    if answer_text.lower() in question_text.lower():
+                        return answer_text
+
+                    if "before or after" in question_text or "after or before" in question_text:
+                        return {"<": "before", ">": "after"}[answer_text]
+                    if "fewer or more" in question_text or "more or fewer" in question_text:
+                        return {"<": "fewer", ">": "more"}[answer_text]
+                    if "higher or lower" in question_text or "lower or higher" in question_text:
+                        return {"<": "lower", ">": "higher"}[answer_text]
+                    if "more or less" in question_text or "less or more" in question_text:
+                        return {"<": "less", ">": "more"}[answer_text]
+                    return answer_text
+
+                for answer_annotation in answer_annotations:
+                    if len(answer_annotation["spans"]) == 1:
+                        answer_annotation["spans"][0] = handle_le_ge_synth_replacements(question_text, answer_annotation["spans"][0])
+
+                try:
+                    instance = self.text_to_instance(question_text, passage_text, question_id, passage_id,
+                                                     answer_annotations)
+                except:
+                    print(f"Skipped question_id: {question_id}.")
+                    skip_count += 1
                 if instance is not None:
                     instances.append(instance)
                 else:

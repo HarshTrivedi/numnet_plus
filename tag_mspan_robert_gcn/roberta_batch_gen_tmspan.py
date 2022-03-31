@@ -31,12 +31,12 @@ class DropBatchGen(object):
 
         print("Load data size {}.".format(len(all_data)))
 
-        self.data = DropBatchGen.make_baches(all_data, args.batch_size if self.is_train else args.eval_batch_size,
+        self.data = DropBatchGen.make_batches(all_data, args.batch_size if self.is_train else args.eval_batch_size,
                                                   self.is_train)
         self.offset = 0
 
     @staticmethod
-    def make_baches(data, batch_size=32, is_train=True):
+    def make_batches(data, batch_size=32, is_train=True):
         if is_train:
             random.shuffle(data)
         if is_train:
