@@ -7,6 +7,7 @@ import numpy as np
 from word2number.w2n import word_to_num
 from typing import List, Dict, Any, Tuple
 from collections import defaultdict, OrderedDict
+import random
 
 
 def get_number_from_word(word, improve_number_extraction=True):
@@ -225,6 +226,58 @@ class DropReader(object):
                     skip_count += 1
         print(f"Skipped {skip_count} questions, kept {len(instances)} questions.")
         return instances
+
+
+    def yield_instance(self, file_path: str):
+        # This is to support lazy loading/reading of the datasets.
+        file_path = cached_path(file_path)
+        print("Reading file at %s", file_path)
+        with open(file_path) as dataset_file:
+            dataset = json.load(dataset_file)
+
+        while True:
+            dataset_items = dataset.items()
+            random.shuffle(dataset_items)
+            for passage_id, passage_info in dataset_items:
+                passage_text = passage_info["passage"]
+                for question_answer in passage_info["qa_pairs"]:
+                    question_id = question_answer["query_id"]
+                    question_text = question_answer["question"].strip()
+                    answer_annotations = []
+                    if "answer" in question_answer:
+                        answer_annotations.append(question_answer["answer"])
+                    if "validated_answers" in question_answer:
+                        answer_annotations += question_answer["validated_answers"]
+
+                    # TODO: This should have been done in preprocessing itself.
+                    def handle_le_ge_synth_replacements(question_text: str, answer_text: str) -> str:
+                        if answer_text not in ("<", ">"):
+                            return answer_text
+                        if answer_text.lower() in question_text.lower():
+                            return answer_text
+
+                        if "before or after" in question_text or "after or before" in question_text:
+                            return {"<": "before", ">": "after"}[answer_text]
+                        if "fewer or more" in question_text or "more or fewer" in question_text:
+                            return {"<": "fewer", ">": "more"}[answer_text]
+                        if "higher or lower" in question_text or "lower or higher" in question_text:
+                            return {"<": "lower", ">": "higher"}[answer_text]
+                        if "more or less" in question_text or "less or more" in question_text:
+                            return {"<": "less", ">": "more"}[answer_text]
+                        return answer_text
+
+                    for answer_annotation in answer_annotations:
+                        if len(answer_annotation["spans"]) == 1:
+                            answer_annotation["spans"][0] = handle_le_ge_synth_replacements(question_text, answer_annotation["spans"][0])
+
+                    try:
+                        instance = self.text_to_instance(question_text, passage_text, question_id, passage_id, answer_annotations)
+                    except:
+                        continue
+
+                    if instance is not None:
+                        yield instance
+
 
     def text_to_instance(self,
                          question_text: str, passage_text: str,
