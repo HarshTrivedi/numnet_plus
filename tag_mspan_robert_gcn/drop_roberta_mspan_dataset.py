@@ -220,6 +220,8 @@ class DropReader(object):
                 except:
                     print(f"Skipped question_id: {question_id}.")
                     skip_count += 1
+                    continue
+
                 if instance is not None:
                     instances.append(instance)
                 else:
