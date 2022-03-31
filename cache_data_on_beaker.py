@@ -109,6 +109,7 @@ def main():
     experiment_config.pop("batch_size", None)
     experiment_config.pop("gradient_accum", None)
     skip_tagging = experiment_config.pop("skip_tagging", False)
+    lazy = experiment_config.pop("lazy", False)
 
     if experiment_config:
         exit(f"Some keys in experiment_config are not used: {experiment_config.keys()}")
@@ -140,12 +141,12 @@ def main():
 
     beaker_image_id = image_name_to_id(beaker_image)
 
-    arguments = ["sh", "cache_data_beaker.sh",  "tag_mspan"]
+    arguments = ["sh", "cache_data_beaker.sh",  "tag_mspan", str(lazy).lower()]
     if skip_tagging:
-        arguments.pop()
+        arguments.pop(-2)
 
     # Prepare Experiment Config
-    beaker_experiment_name = make_beaker_experiment_name(train_filepath, dev_filepath, skip_tagging)
+    beaker_experiment_name = make_beaker_experiment_name(train_filepath, dev_filepath, skip_tagging, skip_train=lazy)
     beaker_experiment_description = make_beaker_experiment_description(train_filepath, dev_filepath, skip_tagging)
 
     task_config = {

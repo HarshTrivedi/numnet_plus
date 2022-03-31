@@ -12,6 +12,7 @@ parser.add_argument("--output_dir", type=str)
 parser.add_argument("--passage_length_limit", type=int, default=463)
 parser.add_argument("--question_length_limit", type=int, default=46)
 parser.add_argument("--tag_mspan", action="store_true")
+parser.add_argument("--skip_train", action="store_true")
 
 args = parser.parse_args()
 
@@ -32,13 +33,14 @@ if args.tag_mspan:
 
     data_format = "drop_dataset_{}.json"
 
-    data_mode = ["train"]
-    for dm in data_mode:
-        dpath = os.path.join(args.input_path, data_format.format(dm))
-        data = train_reader._read(dpath)
-        print("Save data to {}.".format(os.path.join(args.output_dir, "tmspan_cached_roberta_{}.pkl".format(dm))))
-        with open(os.path.join(args.output_dir, "tmspan_cached_roberta_{}.pkl".format(dm)), "wb") as f:
-            pickle.dump(data, f)
+    if not skip_train:
+        data_mode = ["train"]
+        for dm in data_mode:
+            dpath = os.path.join(args.input_path, data_format.format(dm))
+            data = train_reader._read(dpath)
+            print("Save data to {}.".format(os.path.join(args.output_dir, "tmspan_cached_roberta_{}.pkl".format(dm))))
+            with open(os.path.join(args.output_dir, "tmspan_cached_roberta_{}.pkl".format(dm)), "wb") as f:
+                pickle.dump(data, f)
 
     data_mode = ["dev"]
     for dm in data_mode:
@@ -58,13 +60,14 @@ else:
 
     data_format = "drop_dataset_{}.json"
 
-    data_mode = ["train"]
-    for dm in data_mode:
-        dpath = os.path.join(args.input_path, data_format.format(dm))
-        data = train_reader._read(dpath)
-        print("Save data to {}.".format(os.path.join(args.output_dir, "cached_roberta_{}.pkl".format(dm))))
-        with open(os.path.join(args.output_dir, "cached_roberta_{}.pkl".format(dm)), "wb") as f:
-            pickle.dump(data, f)
+    if not skip_train:
+        data_mode = ["train"]
+        for dm in data_mode:
+            dpath = os.path.join(args.input_path, data_format.format(dm))
+            data = train_reader._read(dpath)
+            print("Save data to {}.".format(os.path.join(args.output_dir, "cached_roberta_{}.pkl".format(dm))))
+            with open(os.path.join(args.output_dir, "cached_roberta_{}.pkl".format(dm)), "wb") as f:
+                pickle.dump(data, f)
 
     data_mode = ["dev"]
     for dm in data_mode:

@@ -26,6 +26,16 @@ from processing_scripts.lib import read_jsonl, write_jsonl, hash_object, clean_w
 from cache_data_on_beaker import make_beaker_experiment_name as make_cache_data_beaker_experiment_name
 
 
+def does_experiment_exist(experiment_name: str) -> bool:
+    try:
+        experiment_details = subprocess.check_output([
+            "beaker", "experiment", "inspect", "--format", "json", "harsh-trivedi/"+experiment_name
+        ])
+        return True
+    except:
+        return False
+
+
 def load_dataset_mounts(
     train_filepath: str, dev_filepath: str, cached_data_experiment_name: str, pretrain_experiment_name: str = None
 ) -> List[Dict]:
@@ -51,7 +61,7 @@ def load_dataset_mounts(
             "beaker", "experiment", "inspect", "--format", "json", "harsh-trivedi/"+cached_data_experiment_name
         ]).strip()
     except:
-        exit(f"Cached data experiment not found harsh-trivedi{cached_data_experiment_name}.")
+        exit(f"Cached data experiment not found harsh-trivedi/{cached_data_experiment_name}.")
     experiment_details = json.loads(experiment_details)
     cached_data_dataset_id = experiment_details[0]["executions"][-1]["result"]["beaker"]
     beaker_dataset_mounts.append({"datasetId": cached_data_dataset_id, "containerPath": f"/cache/"})
@@ -156,7 +166,7 @@ def main():
 
     assert skip_tagging in (True, False)
     cache_data_experiment_name = make_cache_data_beaker_experiment_name(train_filepath, dev_filepath, skip_tagging)
-    if cache_data_experiment_name is None and lazy:
+    if not does_experiment_exist(cache_data_experiment_name) and lazy:
         cache_data_experiment_name = make_cache_data_beaker_experiment_name(train_filepath, dev_filepath, skip_tagging, skip_train=True)
     dataset_mounts = load_dataset_mounts(train_filepath, dev_filepath, cache_data_experiment_name, pretrain_experiment_name)
 
@@ -176,7 +186,7 @@ def main():
         str(weight_decay), str(bert_weight_decay), str(batch_size), str(gradient_accum), "tag_mspan", str(lazy).lower()
     ]
     if skip_tagging:
-        arguments.pop()
+        arguments.pop(-2)
 
     # Prepare Experiment Config
     beaker_experiment_name = make_beaker_experiment_name(args.experiment_name)
