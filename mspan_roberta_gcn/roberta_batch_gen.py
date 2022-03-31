@@ -69,7 +69,7 @@ class DropBatchGen(object):
         self.offset = 0
 
     def __len__(self):
-        return len(self.data) if self.data_len is not None else self.data_len
+        return len(self.data) if self.data_len is None else self.data_len
 
     def __iter__(self):
 
