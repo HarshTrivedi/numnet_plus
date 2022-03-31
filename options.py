@@ -10,7 +10,6 @@ def add_data_args(parser: ArgumentParser):
 
     # Post-hoc added by me to hack support for lazy loading (Harsh). Taken from prepare_roberta_data.py.
     parser.add_argument("--input_path", type=str, default=None)
-    parser.add_argument("--model_path", type=str, default=None)
     parser.add_argument("--passage_length_limit", type=int, default=463)
     parser.add_argument("--question_length_limit", type=int, default=46)
     parser.add_argument("--lazy", action="store_true", help="load lazily.", default=False)

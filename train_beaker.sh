@@ -37,7 +37,7 @@ else
     echo "Found no pretrained checkpoint."
 fi
 
-DATA_CONFIG="--data_dir ${CACHE_DIR} --save_dir ${SAVE_DIR} --input_path ${DATA_DIR} --model_path ${MODEL_DIR}"
+DATA_CONFIG="--data_dir ${CACHE_DIR} --save_dir ${SAVE_DIR} --input_path ${DATA_DIR}"
 TRAIN_CONFIG="--batch_size ${BATCH} --eval_batch_size ${BATCH} --max_epoch ${EPOCHS} --num_instances_per_epoch ${NUM_INSTANCES} \
               --warmup 0.06 --optimizer adam  --learning_rate ${LR} --weight_decay ${WD} --seed ${SEED} \
               --gradient_accumulation_steps ${GRAD} --bert_learning_rate ${BLR} --bert_weight_decay ${BWD} \

@@ -231,7 +231,7 @@ class DropReader(object):
     def yield_instance(self, file_path: str):
         # This is to support lazy loading/reading of the datasets.
         file_path = cached_path(file_path)
-        print("Reading file at %s", file_path)
+        print("Yielding file at %s", file_path)
         with open(file_path) as dataset_file:
             dataset = json.load(dataset_file)
 

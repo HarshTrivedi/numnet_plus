@@ -61,11 +61,11 @@ def main():
     logger.info("Loading data...")
     if not args.tag_mspan:
         logger.info("Loading data without tag_mspan.")
-        train_itr = DropBatchGen(args, data_mode="train", tokenizer=tokenizer, make_infinite=True)
+        train_itr = DropBatchGen(args, data_mode="train", tokenizer=tokenizer, make_infinite=True, lazy=args.lazy)
         dev_itr = DropBatchGen(args, data_mode="dev", tokenizer=tokenizer)
     else:
         logger.info("Loading data with tag_mspan.")
-        train_itr = TDropBatchGen(args, data_mode="train", tokenizer=tokenizer, make_infinite=True)
+        train_itr = TDropBatchGen(args, data_mode="train", tokenizer=tokenizer, make_infinite=True, lazy=args.lazy)
         dev_itr = TDropBatchGen(args, data_mode="dev", tokenizer=tokenizer)
 
     if args.num_instances_per_epoch in (None, "None", "none", "null", "Null"):

@@ -3,6 +3,8 @@ import pickle
 import torch
 import random
 from tqdm import tqdm
+from pytorch_transformers.tokenization_roberta import RobertaTokenizer
+from mspan_roberta_gcn.drop_roberta_dataset import DropReader
 
 
 class DropBatchGen(object):
@@ -15,12 +17,14 @@ class DropBatchGen(object):
         self.vocab_size = len(tokenizer)
         self.make_infinite = make_infinite
         self.lazy = lazy
+        self.batch_size = args.batch_size
+        self.tokenizer = tokenizer
 
         if not lazy:
             self.data_len = None
             dpath = "cached_roberta_{}.pkl".format(data_mode)
             with open(os.path.join(args.data_dir, dpath), "rb") as f:
-                print("Load data from {}.".format(dpath))
+                print("Load cached data from {}.".format(dpath))
                 data = pickle.load(f)
 
             all_data = []
@@ -36,14 +40,11 @@ class DropBatchGen(object):
         else:
             assert args.input_path is not None
 
-            if args.model_path is None:
-                tokenizer = RobertaTokenizer.from_pretrained(args.input_path + "/roberta.large")
-            else:
-                tokenizer = RobertaTokenizer.from_pretrained(args.model_path)
-
-            self.raw_data_path = os.path.join(args.input_path, f"drop_dataset_{data_mode}.json")
+            raw_data_path = os.path.join(args.input_path, f"drop_dataset_{data_mode}.json")
+            print("Load lazy data from {}.".format(raw_data_path))
             self.reader = DropReader(tokenizer, args.passage_length_limit, args.question_length_limit)
-            self.data_len = self.reader.count_num_instances(self.raw_data_path)
+            self.instance_iterator = self.reader.yield_instance(raw_data_path)
+            self.data_len = self.reader.count_num_instances(raw_data_path)
 
         self.offset = 0
 
@@ -57,8 +58,14 @@ class DropBatchGen(object):
                 for i in range(0, len(data), batch_size)]
         return [data[i:i + batch_size] for i in range(0, len(data), batch_size)]
 
-    def yield_batch(batch_size=32):
-        return [self.reader.yield_instance(self.raw_data_path) for _ in range(batch_size)]
+    def yield_batch(self):
+        all_data = []
+        for _ in range(self.batch_size):
+            instance = next(self.instance_iterator)
+            question_tokens = self.tokenizer.convert_tokens_to_ids(instance["question_tokens"])
+            passage_tokens = self.tokenizer.convert_tokens_to_ids(instance["passage_tokens"])
+            all_data.append((question_tokens, passage_tokens, instance))
+        return all_data
 
     def reset(self):
         if self.is_train:
