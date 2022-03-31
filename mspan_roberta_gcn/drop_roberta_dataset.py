@@ -264,7 +264,7 @@ class DropReader(object):
             dataset = json.load(dataset_file)
 
         while True:
-            dataset_items = dataset.items()
+            dataset_items = list(dataset.items())
             random.shuffle(dataset_items)
             for passage_id, passage_info in dataset_items:
                 passage_text = passage_info["passage"]
