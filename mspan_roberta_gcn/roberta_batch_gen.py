@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 
 class DropBatchGen(object):
-    def __init__(self, args, data_mode, tokenizer, padding_idx=1, make_infinite=False):
+    def __init__(self, args, data_mode, tokenizer, padding_idx=1, make_infinite=False, lazy=False, raw_data_path: str = None):
         self.args = args
         self.cls_idx = tokenizer.convert_tokens_to_ids(tokenizer.cls_token)
         self.sep_idx = tokenizer.convert_tokens_to_ids(tokenizer.sep_token)
@@ -14,21 +14,36 @@ class DropBatchGen(object):
         self.is_train = data_mode == "train"
         self.vocab_size = len(tokenizer)
         self.make_infinite = make_infinite
-        dpath = "cached_roberta_{}.pkl".format(data_mode)
-        with open(os.path.join(args.data_dir, dpath), "rb") as f:
-            print("Load data from {}.".format(dpath))
-            data = pickle.load(f)
+        self.lazy = lazy
 
-        all_data = []
-        for item in tqdm(data):
-            question_tokens = tokenizer.convert_tokens_to_ids(item["question_tokens"])
-            passage_tokens = tokenizer.convert_tokens_to_ids(item["passage_tokens"])
-            all_data.append((question_tokens, passage_tokens, item))
+        if not lazy:
+            self.data_len = None
+            dpath = "cached_roberta_{}.pkl".format(data_mode)
+            with open(os.path.join(args.data_dir, dpath), "rb") as f:
+                print("Load data from {}.".format(dpath))
+                data = pickle.load(f)
 
-        print("Load data size {}.".format(len(all_data)))
+            all_data = []
+            for item in tqdm(data):
+                question_tokens = tokenizer.convert_tokens_to_ids(item["question_tokens"])
+                passage_tokens = tokenizer.convert_tokens_to_ids(item["passage_tokens"])
+                all_data.append((question_tokens, passage_tokens, item))
 
-        self.data = DropBatchGen.make_batches(all_data, args.batch_size if self.is_train else args.eval_batch_size,
-                                                  self.is_train)
+            print("Load data size {}.".format(len(all_data)))
+
+            self.data = DropBatchGen.make_batches(all_data, args.batch_size if self.is_train else args.eval_batch_size, self.is_train)
+
+        else:
+            assert raw_data_path is not None
+
+            if args.model_path is None:
+                tokenizer = RobertaTokenizer.from_pretrained(args.input_path + "/roberta.large")
+            else:
+                tokenizer = RobertaTokenizer.from_pretrained(args.model_path)
+            self.reader = DropReader(tokenizer, args.passage_length_limit, args.question_length_limit)
+            self.raw_data_path = raw_data_path
+            self.data_len = self.reader.count_num_instances(raw_data_path)
+
         self.offset = 0
 
     @staticmethod
@@ -41,6 +56,9 @@ class DropBatchGen(object):
                 for i in range(0, len(data), batch_size)]
         return [data[i:i + batch_size] for i in range(0, len(data), batch_size)]
 
+    def yield_batch(batch_size=32):
+        return [self.reader.yield_instance(raw_data_path) for _ in range(batch_size)]
+
     def reset(self):
         if self.is_train:
             indices = list(range(len(self.data)))
@@ -51,19 +69,22 @@ class DropBatchGen(object):
         self.offset = 0
 
     def __len__(self):
-        return len(self.data)
+        return len(self.data) if self.data_len is not None else self.data_len
 
     def __iter__(self):
 
         while True:
 
-            if self.offset >= len(self):
-                if self.make_infinite:
-                    self.reset()
-                else:
-                    break
+            if self.lazy:
+                batch = self.yield_batch()
+            else:
+                if self.offset >= len(self):
+                    if self.make_infinite:
+                        self.reset()
+                    else:
+                        break
+                batch = self.data[self.offset]
 
-            batch = self.data[self.offset]
             self.offset += 1
             q_tokens, p_tokens, metas = zip(*batch)
             bsz = len(batch)
