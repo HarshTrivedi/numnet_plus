@@ -47,7 +47,7 @@ BERT_CONFIG="--roberta_model ${MODEL_DIR}"
 
 if [ ${LAZY} = true ];then
     echo "Will process data lazily..."
-    DATA_CONFIG="{DATA_CONFIG} --lazy"
+    DATA_CONFIG="${DATA_CONFIG} --lazy"
 else
     echo "Will process cached data (not lazily)..."
 fi
