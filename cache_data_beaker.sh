@@ -6,7 +6,7 @@ TMSPAN=$1
 SKIP_TRAIN=$2
 
 if [ ${SKIP_TRAIN} = true ];then
-    SKIP_TRAIN_STR="--skip-train"
+    SKIP_TRAIN_STR="--skip_train"
 else
     SKIP_TRAIN_STR=""
 fi
