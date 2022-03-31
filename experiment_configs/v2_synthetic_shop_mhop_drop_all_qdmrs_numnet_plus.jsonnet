@@ -4,4 +4,5 @@ local qdmr_step_type_str = "all";
     "dev_filepath": "processed_data/synthetic_data/sampled_for_mtl/v2_synthetic_sh_mh_drop_" + qdmr_step_type_str + "_dev_drop_format.json",
     "num_instances_per_epoch": 100000,
     "epochs": 20,
+    "lazy": true,
 }
