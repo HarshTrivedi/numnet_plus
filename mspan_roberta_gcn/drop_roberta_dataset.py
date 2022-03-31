@@ -307,6 +307,18 @@ class DropReader(object):
                         yield instance
 
 
+    def count_num_instances(self, file_path: str):
+        # This is to support lazy loading/reading of the datasets.
+        file_path = cached_path(file_path)
+        print("Reading file at %s for counting", file_path)
+        with open(file_path) as dataset_file:
+            dataset = json.load(dataset_file)
+        count = sum([
+            1 for passage_id, passage_info in dataset.items() for question_answer in passage_info["qa_pairs"]
+        ])
+        return count
+
+
     def text_to_instance(self,
                          question_text: str, passage_text: str,
                          question_id: str, passage_id: str,
