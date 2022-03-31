@@ -183,6 +183,7 @@ def main():
                  "OUT_DIR": "/output",
                  "CACHE_DIR": "/cache",
                  "WANDB_RUN_NAME": wandb_run_name,
+                 "WANDB_URL": f"https://wandb.ai/harshtrivedi/synth2realmh/runs/{wandb_run_name}",
              }
          },
          "name": beaker_experiment_name,
