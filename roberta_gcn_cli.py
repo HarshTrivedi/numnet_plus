@@ -53,6 +53,7 @@ def maybe_track_wandb(project_name: str = "synth2realmh"):
             wandb_api_key = json.load(file)["wandb_api_key"]
             wandb.login(key=wandb_api_key)
             wandb.init(project=project_name, name=wandb_run_name)
+            run.get_url()
 
 def main():
     maybe_track_wandb()
@@ -73,8 +74,11 @@ def main():
     args.num_instances_per_epoch = int(args.num_instances_per_epoch)
     num_batches_per_epoch = int(int(args.num_instances_per_epoch) / args.batch_size)
 
-    num_train_steps = int(args.max_epoch * args.num_instances_per_epoch / args.gradient_accumulation_steps)
-    logger.info("Num update steps {}!".format(num_train_steps))
+    num_train_steps = int(args.max_epoch * num_batches_per_epoch / args.gradient_accumulation_steps)
+    num_batch_steps = int(args.max_epoch * num_batches_per_epoch)
+    logger.info("Total num update steps {}!".format(num_train_steps))
+    logger.info("Total num batches      {}!".format(args.max_epoch * num_batches_per_epoch))
+    logger.info("Total num instances    {}!".format(args.max_epoch * args.num_instances_per_epoch))
 
     logger.info("Build bert model.")
     bert_model = RobertaModel.from_pretrained(args.roberta_model)
@@ -116,7 +120,7 @@ def main():
             if model.step % (args.log_per_updates * args.gradient_accumulation_steps) == 0 or model.step == 1:
                 logger.info("Updates[{0:6}] train loss[{1:.5f}] train em[{2:.5f}] f1[{3:.5f}] remaining[{4}]".format(
                     model.updates, model.train_loss.avg, model.em_avg.avg, model.f1_avg.avg,
-                    str((datetime.now() - train_start) / (step + 1) * (num_train_steps - step - 1)).split('.')[0]))
+                    str((datetime.now() - train_start) / (step + 1) * (num_batches_per_epoch - step - 1)).split('.')[0]))
                 model.avg_reset()
         total_num, eval_loss, eval_em, eval_f1 = model.evaluate(dev_itr)
         logger.info(

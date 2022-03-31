@@ -115,7 +115,7 @@ def main():
     weight_decay = experiment_config.pop("weight_decay", 5e-5)
     bert_weight_decay = experiment_config.pop("bert_weight_decay", 0.01)
     batch_size = experiment_config.pop("batch_size", 16)
-    gradient_accum = experiment_config.pop("gradient_accum", 4)
+    gradient_accum = experiment_config.pop("gradient_accum", 2)
     skip_tagging = experiment_config.pop("skip_tagging", False)
 
     if experiment_config:
