@@ -52,8 +52,7 @@ def maybe_track_wandb(project_name: str = "synth2realmh"):
             print("Starting wandb.")
             wandb_api_key = json.load(file)["wandb_api_key"]
             wandb.login(key=wandb_api_key)
-            wandb.init(project=project_name, name=wandb_run_name)
-            run.get_url()
+            wandb.init(project=project_name, name=wandb_run_name, id=wandb_run_name)
 
 def main():
     maybe_track_wandb()
