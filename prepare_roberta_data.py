@@ -33,7 +33,7 @@ if args.tag_mspan:
 
     data_format = "drop_dataset_{}.json"
 
-    if not skip_train:
+    if not args.skip_train:
         data_mode = ["train"]
         for dm in data_mode:
             dpath = os.path.join(args.input_path, data_format.format(dm))
@@ -60,7 +60,7 @@ else:
 
     data_format = "drop_dataset_{}.json"
 
-    if not skip_train:
+    if not args.skip_train:
         data_mode = ["train"]
         for dm in data_mode:
             dpath = os.path.join(args.input_path, data_format.format(dm))
