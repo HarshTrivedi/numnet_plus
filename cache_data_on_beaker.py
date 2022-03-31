@@ -55,10 +55,14 @@ def load_dataset_mounts(train_filepath: str, dev_filepath: str) -> List[Dict]:
     return beaker_dataset_mounts
 
 
-def make_beaker_experiment_name(train_filepath: str, dev_filepath: str, skip_tagging) -> str:
-    hash_ = hash_object(train_filepath + dev_filepath + str(skip_tagging))[:10]
-    train_filepath = train_filepath.replace("train", "train_or_dev")
-    experiment_name = "cache_data_numnetplusv2_" + os.path.basename(train_filepath)[:50] + "__" + hash_
+def make_beaker_experiment_name(train_filepath: str, dev_filepath: str, skip_tagging: bool, skip_train: bool = False) -> str:
+    if not skip_train:
+        hash_ = hash_object(train_filepath + dev_filepath + str(skip_tagging))[:10]
+        train_filepath = train_filepath.replace("train", "train_or_dev")
+        experiment_name = "cache_data_numnetplusv2_" + os.path.basename(train_filepath)[:50] + "__" + hash_
+    else:
+        hash_ = hash_object(dev_filepath + str(skip_tagging))[:10]
+        experiment_name = "cache_data_numnetplusv2_" + os.path.basename(dev_filepath)[:50] + "__" + hash_
     return experiment_name
 
 

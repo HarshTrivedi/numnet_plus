@@ -156,6 +156,8 @@ def main():
 
     assert skip_tagging in (True, False)
     cache_data_experiment_name = make_cache_data_beaker_experiment_name(train_filepath, dev_filepath, skip_tagging)
+    if cache_data_experiment_name is None and lazy:
+        cache_data_experiment_name = make_cache_data_beaker_experiment_name(train_filepath, dev_filepath, skip_tagging, skip_train=True)
     dataset_mounts = load_dataset_mounts(train_filepath, dev_filepath, cache_data_experiment_name, pretrain_experiment_name)
 
     image_prefix = "numnetplusv2"
