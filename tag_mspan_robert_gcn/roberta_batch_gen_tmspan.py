@@ -46,7 +46,10 @@ class DropBatchGen(object):
 
             raw_data_path = os.path.join(args.input_path, f"drop_dataset_{data_mode}.json")
             print("Load lazy data from {}.".format(raw_data_path))
-            self.reader = DropReader(tokenizer, args.passage_length_limit, args.question_length_limit)
+            self.reader = DropReader(
+                tokenizer, args.passage_length_limit, args.question_length_limit,
+                skip_when_all_empty=["passage_span", "question_span", "addition_subtraction", "counting", "multi_span"]
+            )
             self.instance_iterator = self.reader.yield_instance(raw_data_path)
             self.data_len = self.reader.count_num_instances(raw_data_path)
 
