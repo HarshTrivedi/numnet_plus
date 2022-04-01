@@ -71,6 +71,11 @@ class DropBatchGen(object):
             instance = next(self.instance_iterator)
             question_tokens = self.tokenizer.convert_tokens_to_ids(instance["question_tokens"])
             passage_tokens = self.tokenizer.convert_tokens_to_ids(instance["passage_tokens"])
+            question_passage_tokens = [
+                Token(text=instance[0], idx=instance[1][0], edx=instance[1][1] ) for instance in zip(instance["question_passage_tokens"],
+                [(0,0)] + instance["question_token_offsets"] + [(0,0)]+ instance["passage_token_offsets"] + [(0, 0)])
+            ]
+            instance["question_passage_tokens"] = question_passage_tokens
             all_data.append((question_tokens, passage_tokens, instance))
         return all_data
 
