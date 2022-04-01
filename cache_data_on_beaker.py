@@ -61,7 +61,7 @@ def make_beaker_experiment_name(train_filepath: str, dev_filepath: str, skip_tag
         train_filepath = train_filepath.replace("train", "train_or_dev")
         experiment_name = "cache_data_numnetplusv2_" + os.path.basename(train_filepath)[:50] + "__" + hash_
     else:
-        hash_ = hash_object(dev_filepath + str(skip_tagging))[:10]
+        hash_ = hash_object(dev_filepath + str(skip_tagging) + str(skip_train))[:10]
         experiment_name = "cache_data_numnetplusv2_" + os.path.basename(dev_filepath)[:50] + "__" + hash_
     return experiment_name
 
