@@ -2,6 +2,7 @@ import os
 import json
 import options
 import argparse
+import torch
 from pprint import pprint
 from tools.model import DropBertModel
 from mspan_roberta_gcn.roberta_batch_gen import DropBatchGen
