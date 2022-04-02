@@ -104,7 +104,6 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('experiment_name', type=str, help="Experiment name.")
-    parser.add_argument('--pretrain_experiment_name', type=str, help="Pretrain experiment name.", default=None)
     parser.add_argument(
         '--cluster', type=str,
         choices={"v100", "onperm-aristo", "onperm-ai2", "onperm-mosaic", "cpu"},
@@ -129,6 +128,7 @@ def main():
     train_filepath = experiment_config.pop("train_filepath")
     dev_filepath = experiment_config.pop("dev_filepath")
 
+    pretrain_experiment_name = experiment_config.pop("pretrain_experiment_name", None)
     random_seed = experiment_config.pop("random_seed", 345)
     epochs = experiment_config.pop("epochs", 5)
     num_instances_per_epoch = experiment_config.pop("num_instances_per_epoch", None)
@@ -160,9 +160,8 @@ def main():
     beaker_workspace = configs.pop("beaker_workspace")
 
     # Prepare Dataset Mounts
-    pretrain_experiment_name = None
-    if args.pretrain_experiment_name:
-        pretrain_experiment_name = make_beaker_experiment_name(args.pretrain_experiment_name)
+    if pretrain_experiment_name:
+        pretrain_experiment_name = make_beaker_experiment_name(pretrain_experiment_name)
 
     assert skip_tagging in (True, False)
     cache_data_experiment_name = make_cache_data_beaker_experiment_name(train_filepath, dev_filepath, skip_tagging)
