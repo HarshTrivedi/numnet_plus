@@ -114,6 +114,12 @@ def main():
     working_dir = configs.pop("working_dir")
     beaker_workspace = configs.pop("beaker_workspace")
 
+    if args.evaluation_filepath in ("train", "dev"):
+        if args.evaluation_filepath == "train":
+            args.evaluation_filepath = train_filepath
+        elif args.evaluation_filepath == "dev":
+            args.evaluation_filepath = dev_filepath
+
     # Prepare Dataset Mounts
     train_experiment_name = make_train_beaker_experiment_name(args.experiment_name)
     dataset_mounts = load_dataset_mounts(train_experiment_name, args.evaluation_filepath)
